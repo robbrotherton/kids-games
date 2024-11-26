@@ -1,6 +1,6 @@
 const width = 10;
 const height = 10;
-const numMines = 20;
+const numMines = 10;
 
 const game = document.getElementById("game");
 let grid = [];
