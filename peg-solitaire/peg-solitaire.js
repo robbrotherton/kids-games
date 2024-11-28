@@ -87,7 +87,8 @@ function handleDrop(event) {
     );
     originalHole.classList.remove("highlight");
   
-    if (isValidMove(draggedPeg.dataset.row, draggedPeg.dataset.col, row, col)) {
+    // Ensure the target is a valid hole
+    if (row !== undefined && col !== undefined && isValidMove(draggedPeg.dataset.row, draggedPeg.dataset.col, row, col)) {
       const fromRow = parseInt(draggedPeg.dataset.row);
       const fromCol = parseInt(draggedPeg.dataset.col);
       const toRow = parseInt(row);
