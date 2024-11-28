@@ -42,21 +42,20 @@ bodyx {
     background: #3498db;
     border-radius: 50%;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    cursor: grab;
-    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    transition: transform 0.2s;
+    touch-action: none;
 }
 
 .peg.dragging {
-    cursor: grabbing;
-    transform: scale(2);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
-    z-index: 10;
-    /* position: absolute;  allows free movement during drag */
-    /* pointer-events: none; makes it follow the cursor perfectly */
-  }
-  
-  .hole.highlight {
+    position: fixed;
+    pointer-events: none;
+    transform: scale(1.2);
+    opacity: 0.8;
+    z-index: 1000;
+}
+
+.hole.highlight {
     border-color: #f1c40f;
-    background: rgba(241, 196, 15, 0.3); /* subtle yellow glow for origin */
-  }
-  
+    background: rgba(241, 196, 15, 0.3);
+}
