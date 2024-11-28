@@ -20,7 +20,7 @@ bodyx {
     /* adds depth */
     width: max-content;
     /* ensures the grid doesn’t overflow */
-    margin: 20px auto;
+    margin: auto;
 
 }
 
