@@ -119,6 +119,9 @@ function handlePegDrop(e) {
             state[(+fromRow + +row) / 2][(+fromCol + +col) / 2] = 0;
             state[row][col] = 1;
             drawBoard();
+            
+            // Check game state after move
+            checkGameState();
         } else {
             selectedPeg.style.visibility = "visible";
         }
@@ -138,6 +141,70 @@ function handlePegDrop(e) {
     document.removeEventListener("touchend", handlePegDrop);
 }
 
+function checkGameState() {
+    const pegsLeft = countPegs();
+    console.log(pegsLeft);
+    const movesLeft = hasValidMovesRemaining();
+    
+    if (!movesLeft) {
+        if (pegsLeft === 1) {
+            showGameMessage("You won! 🎉");
+        } else {
+            showGameMessage(`Game over! ${pegsLeft} pegs remaining`);
+        }
+    }
+}
+
+function countPegs() {
+    return state.flat().filter(cell => cell === 1).length;
+}
+
+function hasValidMovesRemaining() {
+    for (let fromRow = 0; fromRow < state.length; fromRow++) {
+        for (let fromCol = 0; fromCol < state[0].length; fromCol++) {
+            if (state[fromRow][fromCol] !== 1) continue;
+            
+            // Check all possible jump directions
+            const directions = [
+                [0, 2], [0, -2], [2, 0], [-2, 0]
+            ];
+            
+            for (const [dRow, dCol] of directions) {
+                const toRow = fromRow + dRow;
+                const toCol = fromCol + dCol;
+                
+                // Check bounds before validating move
+                if (toRow >= 0 && toRow < state.length && 
+                    toCol >= 0 && toCol < state[0].length) {
+                    if (isValidMove(fromRow, fromCol, toRow, toCol)) {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
+
+function showGameMessage(message) {
+    const messageEl = document.createElement('div');
+    messageEl.className = 'game-message';
+    messageEl.textContent = message;
+    document.body.appendChild(messageEl);
+    
+    setTimeout(() => messageEl.classList.add('visible'), 100);
+    
+    // Add replay button
+    const replayBtn = document.createElement('button');
+    replayBtn.textContent = 'Play Again';
+    replayBtn.onclick = () => {
+        state = JSON.parse(JSON.stringify(initialState));
+        drawBoard();
+        messageEl.remove();
+    };
+    messageEl.appendChild(replayBtn);
+}
+
 // helper to check valid moves
 function isValidMove(fromRow, fromCol, toRow, toCol) {
     fromRow = parseInt(fromRow);
@@ -145,7 +212,14 @@ function isValidMove(fromRow, fromCol, toRow, toCol) {
     toRow = parseInt(toRow);
     toCol = parseInt(toCol);
 
-    if (state[toRow][toCol] !== 0) return false; // must drop in an empty hole
+    // Check bounds
+    if (toRow < 0 || toRow >= state.length || 
+        toCol < 0 || toCol >= state[0].length) {
+        return false;
+    }
+
+    // Check target is empty
+    if (state[toRow][toCol] !== 0) return false;
 
     const dRow = Math.abs(toRow - fromRow);
     const dCol = Math.abs(toCol - fromCol);

@@ -42,7 +42,7 @@ bodyx {
     background: #3498db;
     border-radius: 50%;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
+    /* cursor: pointer; */
     transition: transform 0.2s;
     touch-action: none;
 }
@@ -58,4 +58,39 @@ bodyx {
 .hole.highlight {
     border-color: #f1c40f;
     background: rgba(241, 196, 15, 0.3);
+}
+
+.game-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    font-size: 1.5rem;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.game-message.visible {
+    opacity: 1;
+}
+
+.game-message button {
+    display: block;
+    margin: 1rem auto 0;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border: none;
+    background: #3498db;
+    color: white;
+    border-radius: 0.5rem;
+    cursor: pointer;
+}
+
+.game-message button:hover {
+    background: #2980b9;
 }
