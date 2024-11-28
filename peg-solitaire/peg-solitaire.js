@@ -36,7 +36,7 @@ function drawBoard() {
                 peg.classList.add("peg");
                 peg.draggable = true;
                 peg.addEventListener("dragstart", handleDragStart);
-                peg.addEventListener("dragend", () => peg.classList.remove("dragging"));
+                peg.addEventListener("dragend", handleDragEnd); // proper dragend handler
                 hole.appendChild(peg);
             }
 
@@ -48,8 +48,6 @@ function drawBoard() {
         });
     });
 }
-
-
 
 // drag and drop handlers
 let draggedPeg = null;
@@ -115,9 +113,6 @@ function handleDrop(event) {
         drawBoard();
     }
   
-    // reset visibility and dragging state
-    draggedPeg.style.visibility = "visible";
-    draggedPeg.classList.remove("dragging");
     draggedPeg = null;
 }
 
@@ -125,6 +120,23 @@ function handleDragLeave(event) {
     event.target.classList.remove("highlight");
 }
 
+function handleDragEnd(event) {
+    // Reset visibility and remove dragging class
+    event.target.style.visibility = "visible";
+    event.target.classList.remove("dragging");
+
+    // Remove highlight from original hole if it exists
+    if (event.target.dataset.row) {
+        const originalHole = document.querySelector(
+            `.hole[data-row="${event.target.dataset.row}"][data-col="${event.target.dataset.col}"]`
+        );
+        if (originalHole) {
+            originalHole.classList.remove("highlight");
+        }
+    }
+    
+    draggedPeg = null;
+}
 
 // helper to check valid moves
 function isValidMove(fromRow, fromCol, toRow, toCol) {
