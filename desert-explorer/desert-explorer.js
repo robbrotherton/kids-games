@@ -1,16 +1,17 @@
-const width = 10;
-const height = 10;
-const numMines = 10;
+const width = 8;
+const height = 8;
+const numMines = 15;
 
 const game = document.getElementById("game");
 let grid = [];
-const mines = new Set();
+let firstClick = true;
 
 function init() {
-    // Clear the existing game board
+
+    // start from scratch on reset
     game.innerHTML = '';
     grid = [];
-    mines.clear();
+    // clearMines();
 
     // create the grid
     for (let y = 0; y < height; y++) {
@@ -33,78 +34,111 @@ function init() {
             cellContent.appendChild(front);
             cellContent.appendChild(back);
             cell.appendChild(cellContent);
+
             game.appendChild(cell);
-            grid[y][x] = { cell, revealed: false, mine: false };
 
-            // Add click event listener to the cell
+            grid[y][x] = { cell, mine: false, revealed: false, flagged: false };
             cell.addEventListener("click", () => reveal(x, y, 0));
-        }
-    }
-
-    // Place mines randomly
-    while (mines.size < numMines) {
-        const x = Math.floor(Math.random() * width);
-        const y = Math.floor(Math.random() * height);
-        if (!grid[y][x].mine) {
-            grid[y][x].mine = true;
-            mines.add(`${x},${y}`);
         }
     }
 }
 
-function countMines(x, y) {
-    let count = 0;
-    for (let dx = -1; dx <= 1; dx++) {
-        for (let dy = -1; dy <= 1; dy++) {
-            const nx = x + dx;
-            const ny = y + dy;
-            if (
-                nx >= 0 &&
-                ny >= 0 &&
-                nx < width &&
-                ny < height &&
-                grid[ny][nx].mine
-            ) {
-                count++;
+function placeMinesAvoiding(safeX, safeY) {
+    let placedMines = 0;
+
+    while (placedMines < numMines) {
+        const x = Math.floor(Math.random() * width);
+        const y = Math.floor(Math.random() * height);
+        const isSafeZone = Math.abs(x - safeX) <= 1 && Math.abs(y - safeY) <= 1;
+
+        if (!grid[y][x].mine && !isSafeZone) {
+            grid[y][x].mine = true;
+            placedMines++;
+        }
+    }
+
+    // validate the board and retry if not solvable
+    if (!validateBoard()) {
+        clearMines();
+        placeMinesAvoiding(safeX, safeY);
+    }
+}
+
+function clearMines() {
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            grid[y][x].mine = false;
+        }
+    }
+}
+
+function validateBoard() {
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            if (grid[y][x].mine) {
+                const numbers = countNumberedNeighbors(x, y);
+                if (numbers < 2) {
+                    return false; // reject the board
+                }
             }
         }
     }
-    return count;
+    return true;
+}
+
+function countNumberedNeighbors(x, y) {
+    return getNeighbors(x, y).filter(([nx, ny]) => countMines(nx, ny) > 0).length;
+}
+
+function countMines(x, y) {
+    return getNeighbors(x, y).filter(([nx, ny]) => grid[ny][nx]?.mine).length;
+}
+
+function getNeighbors(x, y) {
+    return [
+        [x - 1, y - 1],
+        [x, y - 1],
+        [x + 1, y - 1],
+        [x - 1, y],
+        [x + 1, y],
+        [x - 1, y + 1],
+        [x, y + 1],
+        [x + 1, y + 1],
+    ].filter(([nx, ny]) => nx >= 0 && ny >= 0 && nx < width && ny < height);
 }
 
 function reveal(x, y, delay) {
     if (x < 0 || y < 0 || x >= width || y >= height) return;
     const cellData = grid[y][x];
-    if (cellData.revealed) return;
+    if (cellData.revealed || cellData.flagged) return;
+
+    if (firstClick) {
+        placeMinesAvoiding(x, y);
+        firstClick = false;
+    }
 
     cellData.revealed = true;
-    cellData.delay = delay;
+    const back = cellData.cell.querySelector(".cell-back");
+    const mineCount = countMines(x, y);
+
     setTimeout(() => {
         cellData.cell.classList.add("revealed");
-        const back = cellData.cell.querySelector(".cell-back");
 
         if (cellData.mine) {
-            cellData.cell.classList.add("mine");
-            back.textContent = "🌵"; // cactus emoji
+            back.textContent = "🌵";
+            back.classList.add("mine");
+            //   alert("game over!");
             if (delay === 0) showMessage("Ouch! You hit a cactus!");
+
             return;
         }
 
-        const mineCount = countMines(x, y);
         if (mineCount > 0) {
             back.textContent = mineCount;
+            back.dataset.number = mineCount;
         } else {
-            // mark as an oasis
             back.classList.add("oasis");
-            // back.textContent = "💧"; // oasis drop
-            // recursively reveal neighbors with increasing delay
-            for (let dx = -1; dx <= 1; dx++) {
-                for (let dy = -1; dy <= 1; dy++) {
-                    if (dx !== 0 || dy !== 0) {
-                        reveal(x + dx, y + dy, delay + 20);
-                    }
-                }
-            }
+            getNeighbors(x, y).forEach(([nx, ny]) => reveal(nx, ny, delay + 50));
         }
     }, delay);
 }
@@ -126,6 +160,7 @@ document.getElementById("try-again-button").addEventListener("click", () => {
         setTimeout(() => {
             cell.classList.remove("revealed");
             if (index === cells.length - 1) {
+                firstClick = true;
                 setTimeout(init, 300); // Restart the game after the animation
             }
         }, 10);
