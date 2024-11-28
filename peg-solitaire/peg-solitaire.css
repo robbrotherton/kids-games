@@ -1,0 +1,62 @@
+bodyx {
+    display: flex;
+    background: #ffd5d5;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+#game {
+    display: grid;
+    grid-template-columns: repeat(7, 50px);
+    grid-template-rows: repeat(7, 50px);
+    /* ensures consistent rows */
+    gap: 5px;
+    background: #f9e8c8;
+    /* a warm background color for contrast */
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    /* adds depth */
+    width: max-content;
+    /* ensures the grid doesn’t overflow */
+    margin: 20px auto;
+
+}
+
+.hole {
+    width: 50px;
+    height: 50px;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    background: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.peg {
+    width: 40px;
+    height: 40px;
+    background: #3498db;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    cursor: grab;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.peg.dragging {
+    cursor: grabbing;
+    transform: scale(2);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+    /* position: absolute;  allows free movement during drag */
+    /* pointer-events: none; makes it follow the cursor perfectly */
+  }
+  
+  .hole.highlight {
+    border-color: #f1c40f;
+    background: rgba(241, 196, 15, 0.3); /* subtle yellow glow for origin */
+  }
+  
