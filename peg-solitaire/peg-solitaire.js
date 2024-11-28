@@ -75,11 +75,24 @@ function handleDragStart(event) {
     }, 0);
 }
 
+function getHoleFromTarget(target) {
+    // If target is a peg, get its parent hole
+    return target.classList.contains('peg') ? target.parentElement : target;
+}
 
+function handleDragOver(event) {
+    event.preventDefault();
+    const hole = getHoleFromTarget(event.target);
+    const { row, col } = hole.dataset;
+
+    if (isValidMove(draggedPeg.dataset.row, draggedPeg.dataset.col, row, col)) {
+        hole.classList.add("highlight");
+    }
+}
 
 function handleDrop(event) {
-    const target = event.target;
-    const { row, col } = target.dataset;
+    const hole = getHoleFromTarget(event.target);
+    const { row, col } = hole.dataset;
   
     // clear highlight from the original hole
     const originalHole = document.querySelector(
@@ -89,49 +102,24 @@ function handleDrop(event) {
   
     // Ensure the target is a valid hole
     if (row !== undefined && col !== undefined && isValidMove(draggedPeg.dataset.row, draggedPeg.dataset.col, row, col)) {
-      const fromRow = parseInt(draggedPeg.dataset.row);
-      const fromCol = parseInt(draggedPeg.dataset.col);
-      const toRow = parseInt(row);
-      const toCol = parseInt(col);
-  
-      // make the move
-      state[fromRow][fromCol] = 0;
-      state[(fromRow + toRow) / 2][(fromCol + toCol) / 2] = 0; // remove jumped peg
-      state[toRow][toCol] = 1;
-  
-      drawBoard();
+        const fromRow = parseInt(draggedPeg.dataset.row);
+        const fromCol = parseInt(draggedPeg.dataset.col);
+        const toRow = parseInt(row);
+        const toCol = parseInt(col);
+    
+        // make the move
+        state[fromRow][fromCol] = 0;
+        state[(fromRow + toRow) / 2][(fromCol + toCol) / 2] = 0; // remove jumped peg
+        state[toRow][toCol] = 1;
+    
+        drawBoard();
     }
   
     // reset visibility and dragging state
     draggedPeg.style.visibility = "visible";
     draggedPeg.classList.remove("dragging");
     draggedPeg = null;
-  }
-  
-
-
-function handleDragOver(event) {
-    event.preventDefault();
-    const { row, col } = event.target.dataset;
-
-    if (isValidMove(draggedPeg.dataset.row, draggedPeg.dataset.col, row, col)) {
-        event.target.classList.add("highlight");
-    }
 }
-
-function handleDragEnd() {
-    // ensure peg is shown again if drop is invalid
-    draggedPeg.style.display = "";
-    draggedPeg.classList.remove("dragging");
-
-    // remove highlight from original hole
-    const originalHole = document.querySelector(
-        `.hole[data-row="${draggedPeg.dataset.row}"][data-col="${draggedPeg.dataset.col}"]`
-    );
-    originalHole.classList.remove("highlight");
-    draggedPeg = null;
-}
-
 
 function handleDragLeave(event) {
     event.target.classList.remove("highlight");
