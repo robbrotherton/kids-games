@@ -34,108 +34,108 @@ function drawBoard() {
             if (cell === 1) {
                 const peg = document.createElement("div");
                 peg.classList.add("peg");
-                peg.draggable = true;
-                peg.addEventListener("dragstart", handleDragStart);
-                peg.addEventListener("dragend", handleDragEnd); // proper dragend handler
+                peg.addEventListener("mousedown", handlePegPickup);
+                peg.addEventListener("touchstart", handlePegPickup);
                 hole.appendChild(peg);
             }
-
-            hole.addEventListener("dragover", handleDragOver);
-            hole.addEventListener("dragleave", handleDragLeave); // remove highlight on leave
-            hole.addEventListener("drop", handleDrop);
 
             board.appendChild(hole);
         });
     });
 }
 
-// drag and drop handlers
-let draggedPeg = null;
+let selectedPeg = null;
+let dragPeg = null;
 
-function handleDragStart(event) {
-    draggedPeg = event.target;
-    const { row, col } = draggedPeg.parentElement.dataset;
-    draggedPeg.dataset.row = row;
-    draggedPeg.dataset.col = col;
-
-    // add dragging effect
-    draggedPeg.classList.add("dragging");
-
-    // highlight the original hole
-    const originalHole = document.querySelector(
-        `.hole[data-row="${row}"][data-col="${col}"]`
-    );
-    originalHole.classList.add("highlight");
-
-    // hide the peg after drag starts
-    setTimeout(() => {
-        draggedPeg.style.visibility = "hidden"; // hide it but keep its space intact
-    }, 0);
+function handlePegPickup(e) {
+    e.preventDefault();
+    selectedPeg = e.target;
+    const { row, col } = selectedPeg.parentElement.dataset;
+    
+    // Create drag peg
+    dragPeg = selectedPeg.cloneNode(true);
+    dragPeg.classList.add("dragging");
+    document.body.appendChild(dragPeg);
+    
+    // Hide original peg
+    selectedPeg.style.visibility = "hidden";
+    
+    // Highlight original hole
+    selectedPeg.parentElement.classList.add("highlight");
+    
+    // Add move and end listeners
+    document.addEventListener("mousemove", handlePointerMove);
+    document.addEventListener("touchmove", handlePointerMove);
+    document.addEventListener("mouseup", handlePegDrop);
+    document.addEventListener("touchend", handlePegDrop);
+    
+    // Position drag peg initially
+    updateDragPegPosition(e.clientX || e.touches[0].clientX, e.clientY || e.touches[0].clientY);
 }
 
-function getHoleFromTarget(target) {
-    // If target is a peg, get its parent hole
-    return target.classList.contains('peg') ? target.parentElement : target;
-}
-
-function handleDragOver(event) {
-    event.preventDefault();
-    const hole = getHoleFromTarget(event.target);
-    const { row, col } = hole.dataset;
-
-    if (isValidMove(draggedPeg.dataset.row, draggedPeg.dataset.col, row, col)) {
-        hole.classList.add("highlight");
+function updateDragPegPosition(x, y) {
+    if (dragPeg) {
+        dragPeg.style.left = `${x - 20}px`;
+        dragPeg.style.top = `${y - 20}px`;
     }
 }
 
-function handleDrop(event) {
-    const hole = getHoleFromTarget(event.target);
-    const { row, col } = hole.dataset;
-  
-    // clear highlight from the original hole
-    const originalHole = document.querySelector(
-      `.hole[data-row="${draggedPeg.dataset.row}"][data-col="${draggedPeg.dataset.col}"]`
-    );
-    originalHole.classList.remove("highlight");
-  
-    // Ensure the target is a valid hole
-    if (row !== undefined && col !== undefined && isValidMove(draggedPeg.dataset.row, draggedPeg.dataset.col, row, col)) {
-        const fromRow = parseInt(draggedPeg.dataset.row);
-        const fromCol = parseInt(draggedPeg.dataset.col);
-        const toRow = parseInt(row);
-        const toCol = parseInt(col);
+function handlePointerMove(e) {
+    e.preventDefault();
+    const x = e.clientX || e.touches[0].clientX;
+    const y = e.clientY || e.touches[0].clientY;
+    updateDragPegPosition(x, y);
     
-        // make the move
-        state[fromRow][fromCol] = 0;
-        state[(fromRow + toRow) / 2][(fromCol + toCol) / 2] = 0; // remove jumped peg
-        state[toRow][toCol] = 1;
-    
-        drawBoard();
-    }
-  
-    draggedPeg = null;
-}
-
-function handleDragLeave(event) {
-    event.target.classList.remove("highlight");
-}
-
-function handleDragEnd(event) {
-    // Reset visibility and remove dragging class
-    event.target.style.visibility = "visible";
-    event.target.classList.remove("dragging");
-
-    // Remove highlight from original hole if it exists
-    if (event.target.dataset.row) {
-        const originalHole = document.querySelector(
-            `.hole[data-row="${event.target.dataset.row}"][data-col="${event.target.dataset.col}"]`
-        );
-        if (originalHole) {
-            originalHole.classList.remove("highlight");
+    // Highlight valid holes
+    const holeElement = document.elementFromPoint(x, y);
+    if (holeElement && holeElement.classList.contains("hole")) {
+        const { row, col } = holeElement.dataset;
+        const fromRow = selectedPeg.parentElement.dataset.row;
+        const fromCol = selectedPeg.parentElement.dataset.col;
+        
+        document.querySelectorAll(".hole.highlight").forEach(h => {
+            if (h !== selectedPeg.parentElement) h.classList.remove("highlight");
+        });
+        
+        if (isValidMove(fromRow, fromCol, row, col)) {
+            holeElement.classList.add("highlight");
         }
     }
+}
+
+function handlePegDrop(e) {
+    const x = e.clientX || e.changedTouches?.[0].clientX;
+    const y = e.clientY || e.changedTouches?.[0].clientY;
+    const holeElement = document.elementFromPoint(x, y);
     
-    draggedPeg = null;
+    if (holeElement?.classList.contains("hole")) {
+        const { row, col } = holeElement.dataset;
+        const fromRow = selectedPeg.parentElement.dataset.row;
+        const fromCol = selectedPeg.parentElement.dataset.col;
+        
+        if (isValidMove(fromRow, fromCol, row, col)) {
+            // Make the move
+            state[fromRow][fromCol] = 0;
+            state[(+fromRow + +row) / 2][(+fromCol + +col) / 2] = 0;
+            state[row][col] = 1;
+            drawBoard();
+        } else {
+            selectedPeg.style.visibility = "visible";
+        }
+    } else {
+        selectedPeg.style.visibility = "visible";
+    }
+    
+    // Cleanup
+    dragPeg.remove();
+    dragPeg = null;
+    selectedPeg = null;
+    document.querySelectorAll(".hole.highlight").forEach(h => h.classList.remove("highlight"));
+    
+    document.removeEventListener("mousemove", handlePointerMove);
+    document.removeEventListener("touchmove", handlePointerMove);
+    document.removeEventListener("mouseup", handlePegDrop);
+    document.removeEventListener("touchend", handlePegDrop);
 }
 
 // helper to check valid moves
