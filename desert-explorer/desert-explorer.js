@@ -1,6 +1,6 @@
-const width = 8;
-const height = 8;
-const numMines = 15;
+const width = 6;
+const height = 6;
+const numMines = 4;
 
 const game = document.getElementById("game");
 let grid = [];
@@ -10,6 +10,7 @@ function init() {
 
     // start from scratch on reset
     game.innerHTML = '';
+    game.style = `grid-template-columns: repeat( ${width}, 40px);`;
     grid = [];
     // clearMines();
 

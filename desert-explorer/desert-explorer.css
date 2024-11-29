@@ -6,7 +6,7 @@
     max-width: 80%;
     justify-content: center;
     display: grid;
-    grid-template-columns: repeat(8, 40px);
+    /* grid-template-columns: repeat(8, 40px); */
     grid-gap: 3px;
     margin: auto;
     /* margin-top: 20px; */
