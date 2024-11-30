@@ -1,6 +1,6 @@
-const width = 8;
-const height = 8;
-const numMines = 10;
+const width = 4;
+const height = 4;
+const numMines = 4;
 
 const game = document.getElementById("game");
 let grid = [];
@@ -51,7 +51,7 @@ function init() {
 }
 
 function placeMinesAvoiding(safeX, safeY) {
-    const MAX_ATTEMPTS = 10;
+    const MAX_ATTEMPTS = 50;
     let attempts = 0;
     
     do {
@@ -61,7 +61,10 @@ function placeMinesAvoiding(safeX, safeY) {
         while (placedMines < numMines) {
             const x = Math.floor(Math.random() * width);
             const y = Math.floor(Math.random() * height);
-            const isSafeZone = Math.abs(x - safeX) <= 1 && Math.abs(y - safeY) <= 1;
+            // New safer safe zone - just the clicked cell and orthogonal adjacents
+            const isSafeZone = (x === safeX && y === safeY) ||  // clicked cell
+                              (x === safeX && Math.abs(y - safeY) === 1) ||  // vertical adjacents
+                              (y === safeY && Math.abs(x - safeX) === 1);    // horizontal adjacents
 
             if (!grid[y][x].mine && !isSafeZone) {
                 grid[y][x].mine = true;
