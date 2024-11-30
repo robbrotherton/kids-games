@@ -30,6 +30,14 @@
     cursor: default;
 }
 
+.cell-front {
+    font-size: 0.8rem;
+    color: #555;
+    text-align: center;
+    line-height: 40px; /* match cell height */
+}
+
+
 .cell-content {
     width: 100%;
     height: 100%;
@@ -79,10 +87,34 @@
     font-size: 2.5em;
 }
 
+.cell-front.mine {
+    background-color: rgb(221, 81, 30);
+    /* deeper sand */
+    color: #2e8b57;
+    /* cactus green */
+    font-size: 2.5em;
+}
+
 .cell-back.oasis {
     background-color: #80bed4;
     /* oasis blue */
 }
+
+.cell.flagged .cell-back {
+    background-color: #ffc107; /* gold color for flags */
+    color: #000; /* flag text color */
+    font-weight: bold;
+    text-align: center;
+}
+
+.cell.safe .cell-front {
+    background-color: #d4f8d4; /* light green for safe cells */
+}
+
+.cell.mine-hint .cell-front {
+    background-color: #f9e79f; /* light yellow for definite mines */
+}
+
 
 @media (max-width: 600px) {
     #game {
