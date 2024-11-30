@@ -7,11 +7,11 @@ let grid = [];
 let firstClick = true;
 let revealedCells = 0;
 
-function generateBlobPoints(numPoints = 16, radius = 200) {  // increased points
+function generateBlobPoints(numPoints = 30, radius = 100) {  // increased points
     const points = [];
-    const baseJitter = 0.4;  // base randomness
-    const waveFreq = 3;      // how many small waves to add
-    const waveAmp = 0.15;    // how pronounced the waves are
+    const baseJitter = 0.5;  // base randomness
+    const waveFreq = 100;      // how many small waves to add
+    const waveAmp = 0.01;    // how pronounced the waves are
 
     for (let i = 0; i < numPoints; i++) {
         const angle = (i / numPoints) * Math.PI * 2;
@@ -33,7 +33,7 @@ function generateBlobPoints(numPoints = 16, radius = 200) {  // increased points
 }
 
 function createBlobPath(points) {
-    const smooth = 0.35;  // reduced for smoother transitions
+    const smooth = 0.3;  // reduced for smoother transitions
     let path = `M ${points[0].x},${points[0].y}`;
 
     // Create smoother curves by using more control points
@@ -56,6 +56,30 @@ function createBlobPath(points) {
 }
 
 function init() {
+    // Create flags row container
+    let flagsRow = document.querySelector('.flags-row');
+    if (!flagsRow) {
+        flagsRow = document.createElement('div');
+        flagsRow.className = 'flags-row';
+        game.parentElement.insertBefore(flagsRow, game);
+        
+        // Create individual flag containers
+        for (let i = 0; i < numMines; i++) {
+            const flagContainer = document.createElement('div');
+            flagContainer.className = 'flag-container';
+            
+            const flag = document.createElement('div');
+            flag.className = 'draggable-flag';
+            flag.textContent = 'x';
+            flag.draggable = true;
+            flag.addEventListener('dragstart', handleDragStart);
+            flag.addEventListener('dragend', handleDragEnd);
+            
+            flagContainer.appendChild(flag);
+            flagsRow.appendChild(flagContainer);
+        }
+    }
+
     // Create blob container if it doesn't exist
     let blobContainer = document.querySelector('.blob-container');
     if (!blobContainer) {
@@ -117,6 +141,10 @@ function init() {
             });
             cell.addEventListener("touchstart", handleLongPressStart);
             cell.addEventListener("touchend", handleLongPressEnd);
+
+            // Add drop event listeners
+            cell.addEventListener('dragover', handleDragOver);
+            cell.addEventListener('drop', (e) => handleDrop(e, x, y));
         }
     }
 }
@@ -253,9 +281,33 @@ function reveal(x, y, delay) {
     checkWin();
 }
 
-function toggleFlag(x, y) {
+function toggleFlag(x, y, createNewFlag = true, removeFlag = true) {
     const cellData = grid[y][x];
-    if (cellData.revealed) return; // can't flag revealed cells
+    if (cellData.revealed) return;
+
+    // If we're setting a flag, remove one from the flags row (unless told not to)
+    if (!cellData.flagged && removeFlag) {
+        const flagsRow = document.querySelector('.flags-row');
+        const firstFlagContainer = flagsRow.querySelector('.flag-container');
+        if (firstFlagContainer) {
+            firstFlagContainer.remove();
+        }
+    } else if (createNewFlag) {
+        // Create new flag container when unflagging
+        const flagsRow = document.querySelector('.flags-row');
+        const flagContainer = document.createElement('div');
+        flagContainer.className = 'flag-container';
+        
+        const newFlag = document.createElement('div');
+        newFlag.className = 'draggable-flag';
+        newFlag.textContent = 'x';
+        newFlag.draggable = true;
+        newFlag.addEventListener('dragstart', handleDragStart);
+        newFlag.addEventListener('dragend', handleDragEnd);
+        
+        flagContainer.appendChild(newFlag);
+        flagsRow.appendChild(flagContainer);
+    }
 
     cellData.flagged = !cellData.flagged;
 
@@ -617,10 +669,70 @@ document.getElementById("try-again-button").addEventListener("click", () => {
             if (index === cells.length - 1) {
                 revealedCells = 0;
                 firstClick = true;
-                setTimeout(init, 300); // Restart the game after the animation
+                
+                // Reset flags row with animation
+                const flagsRow = document.querySelector('.flags-row');
+                if (flagsRow) {
+                    // Fade out current flags
+                    flagsRow.style.opacity = '0';
+                    setTimeout(() => {
+                        // Clear and recreate flags
+                        flagsRow.innerHTML = '';
+                        for (let i = 0; i < numMines; i++) {
+                            const flagContainer = document.createElement('div');
+                            flagContainer.className = 'flag-container';
+                            
+                            const flag = document.createElement('div');
+                            flag.className = 'draggable-flag';
+                            flag.textContent = 'x';
+                            flag.draggable = true;
+                            flag.addEventListener('dragstart', handleDragStart);
+                            flag.addEventListener('dragend', handleDragEnd);
+                            
+                            flagContainer.appendChild(flag);
+                            flagsRow.appendChild(flagContainer);
+                        }
+                        // Fade in new flags
+                        flagsRow.style.opacity = '1';
+                        setTimeout(init, 300); // Restart the game after flags are reset
+                    }, 300);
+                }
             }
         }, 10);
     });
 });
+
+// Add these new drag and drop handler functions
+function handleDragStart(e) {
+    e.target.classList.add('dragging');
+    e.dataTransfer.setData('text/plain', 'flag');
+    e.dataTransfer.effectAllowed = 'move';
+}
+
+function handleDragEnd(e) {
+    e.target.classList.remove('dragging');
+}
+
+function handleDragOver(e) {
+    if (e.preventDefault) {
+        e.preventDefault(); // Necessary to allow drop
+    }
+    e.dataTransfer.dropEffect = 'move';
+    return false;
+}
+
+function handleDrop(e, x, y) {
+    e.preventDefault();
+    const cellData = grid[y][x];
+    
+    if (!cellData.revealed && !cellData.flagged) {
+        // Remove the entire flag container, not just the draggable flag
+        const draggedFlag = document.querySelector('.draggable-flag.dragging');
+        if (draggedFlag) {
+            draggedFlag.parentElement.remove(); // Remove the container
+        }
+        toggleFlag(x, y, false, false); // Don't create new flag and don't remove another flag
+    }
+}
 
 init();
