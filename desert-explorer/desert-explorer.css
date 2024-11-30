@@ -69,6 +69,7 @@ main {
 }
 
 .cell {
+    font-family: Trade Winds;
     width: 40px;
     height: 40px;
     display: flex;
@@ -77,7 +78,7 @@ main {
     border: 1px solid #e3c98c;
     background-color: #f9e8c7;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 2em;
     font-weight: bold;
     perspective: 500px;
 }
@@ -87,7 +88,7 @@ main {
 }
 
 .cell-front {
-    font-size: 0.8rem;
+    font-size: 1.5em;
     color: #555;
     text-align: center;
     line-height: 40px; /* match cell height */
@@ -141,7 +142,7 @@ main {
     /* deeper sand */
     color: #2e8b57;
     /* cactus green */
-    font-size: 2.5em;
+    font-size: 1.5em;
 }
 
 .cell-front.mine {
@@ -152,8 +153,14 @@ main {
     font-size: 2.5em;
 }
 
+.cell-back.mine img {
+    width: 1em;
+    height: 1em;
+}
+
 .cell-back.oasis {
-    font-size: 2em;
+    /* margin-top: -0em; */
+    font-size: 1.5em;
     background-color: #eedcb8;
     /* oasis blue */
 }
@@ -166,13 +173,13 @@ main {
 }
 
 .cell.safe .cell-front {
-    background-color: #d4f8d4; /* light green for safe cells */
+    /* background-color: #d4f8d4; /* light green for safe cells */
 }
+
 
 .cell.mine-hint .cell-front {
-    background-color: #f9e79f; /* light yellow for definite mines */
+    /* background-color: #f9e79f; /* light yellow for definite mines */
 }
-
 
 @media (max-width: 600px) {
     #game {

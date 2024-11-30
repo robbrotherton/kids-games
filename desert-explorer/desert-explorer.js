@@ -231,7 +231,7 @@ function reveal(x, y, delay) {
         cellData.cell.classList.add("revealed");
 
         if (cellData.mine) {
-            back.textContent = "🌵";
+            back.innerHTML = "<img src='treasure-chest.png'>";
             back.classList.add("mine");
             //   alert("game over!");
             if (delay === 0) showMessage("Ouch! You hit a cactus!");
@@ -261,7 +261,7 @@ function toggleFlag(x, y) {
 
     if (cellData.flagged) {
         cellData.cell.classList.add("flagged");
-        cellData.cell.querySelector(".cell-front").textContent = "🚩"; // add flag icon
+        cellData.cell.querySelector(".cell-front").textContent = "x"; // add flag icon
     } else {
         cellData.cell.classList.remove("flagged");
         cellData.cell.querySelector(".cell-front").textContent = ""; // remove flag icon
