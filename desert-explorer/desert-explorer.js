@@ -19,11 +19,11 @@ function generateBlobPoints(numPoints = 16, radius = 200) {  // increased points
         const mainJitter = (Math.random() - 0.5) * baseJitter;
         const wave = Math.sin(angle * waveFreq) * waveAmp;
         const r = radius * (1 + mainJitter + wave);
-        
+
         // Add slight x/y variation for more natural look
         const xOffset = (Math.random() - 0.5) * 10;
         const yOffset = (Math.random() - 0.5) * 10;
-        
+
         points.push({
             x: Math.cos(angle) * r + radius * 1.2 + xOffset,
             y: Math.sin(angle) * r + radius * 1.2 + yOffset
@@ -35,23 +35,23 @@ function generateBlobPoints(numPoints = 16, radius = 200) {  // increased points
 function createBlobPath(points) {
     const smooth = 0.35;  // reduced for smoother transitions
     let path = `M ${points[0].x},${points[0].y}`;
-    
+
     // Create smoother curves by using more control points
     for (let i = 0; i < points.length; i++) {
         const p0 = points[(i - 1 + points.length) % points.length];
         const p1 = points[i];
         const p2 = points[(i + 1) % points.length];
         const p3 = points[(i + 2) % points.length];
-        
+
         // Use four points to calculate control points
         const cp1x = p1.x + (p2.x - p0.x) * smooth;
         const cp1y = p1.y + (p2.y - p0.y) * smooth;
         const cp2x = p2.x - (p3.x - p1.x) * smooth;
         const cp2y = p2.y - (p3.y - p1.y) * smooth;
-        
+
         path += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${p2.x},${p2.y}`;
     }
-    
+
     return path + 'Z';
 }
 
@@ -68,17 +68,17 @@ function init() {
         blobContainer.className = 'blob-container';
         gameContainer.appendChild(blobContainer);
     }
-    
+
     // Generate new blob with adjusted size
     const blobPoints = generateBlobPoints(8, 120);
     const blobPath = createBlobPath(blobPoints);
-    
+
     blobContainer.innerHTML = `
         <svg viewBox="0 0 300 300" class="blob" preserveAspectRatio="xMidYMid meet">
             <path d="${blobPath}" />
         </svg>
     `;
-    
+
     // start from scratch on reset
     game.innerHTML = '';
     game.style = `grid-template-columns: repeat( ${width}, 40px);`;
@@ -124,7 +124,7 @@ function init() {
 function placeMinesAvoiding(safeX, safeY) {
     const MAX_ATTEMPTS = 50;
     let attempts = 0;
-    
+
     do {
         clearMines();
         let placedMines = 0;
@@ -134,8 +134,8 @@ function placeMinesAvoiding(safeX, safeY) {
             const y = Math.floor(Math.random() * height);
             // New safer safe zone - just the clicked cell and orthogonal adjacents
             const isSafeZone = (x === safeX && y === safeY) ||  // clicked cell
-                              (x === safeX && Math.abs(y - safeY) === 1) ||  // vertical adjacents
-                              (y === safeY && Math.abs(x - safeX) === 1);    // horizontal adjacents
+                (x === safeX && Math.abs(y - safeY) === 1) ||  // vertical adjacents
+                (y === safeY && Math.abs(x - safeX) === 1);    // horizontal adjacents
 
             if (!grid[y][x].mine && !isSafeZone) {
                 grid[y][x].mine = true;
@@ -234,7 +234,7 @@ function reveal(x, y, delay) {
             back.innerHTML = "<img src='treasure-chest.png'>";
             back.classList.add("mine");
             //   alert("game over!");
-            if (delay === 0) showMessage("Ouch! You hit a cactus!");
+            if (delay === 0) showMessage("You found some treasure!");
 
             return;
         }
@@ -290,13 +290,32 @@ function handleLongPressEnd() {
 
 
 function checkWin() {
-    // console.log("Checking win conditions");
     const totalNonMines = width * height - numMines;
     const correctlyFlaggedMines = grid.flat().filter(cell => cell.mine && cell.flagged).length;
     const totalFlags = grid.flat().filter(cell => cell.flagged).length;
+    const allRevealed = revealedCells === totalNonMines;
 
-    if (revealedCells === totalNonMines || correctlyFlaggedMines === numMines && totalFlags === numMines) {
-        showMessage("Congratulations! You found all the treasure!");
+    if (correctlyFlaggedMines === numMines && totalFlags === numMines) {
+        showMessage("Yarrr! You found all the treasure!");
+
+        // Reveal all flagged mine cells with a delay effect
+        grid.flat()
+            .filter(cell => cell.flagged && cell.mine)
+            .forEach((cell, index) => {
+                setTimeout(() => {
+                    cell.revealed = true;
+                    cell.cell.classList.add("revealed");
+                    const back = cell.cell.querySelector(".cell-back");
+                    back.innerHTML = "<img src='treasure-chest.png'>";
+                    back.classList.add("mine");
+                }, index * 100);
+            });
+
+        confetti({
+            particleCount: 200,
+            spread: 70,
+            origin: { y: 0.9 }
+        });
     }
 }
 
@@ -349,7 +368,7 @@ function findDefiniteSafeCells(x, y, markedMines) {
     const mineCount = countMines(x, y); // number on the revealed cell
     const neighbors = getNeighbors(x, y);
 
-    const flaggedOrMarkedMines = neighbors.filter(([nx, ny]) => 
+    const flaggedOrMarkedMines = neighbors.filter(([nx, ny]) =>
         grid[ny][nx].flagged || markedMines.has(`${nx},${ny}`)
     );
     const unknownNeighbors = neighbors.filter(([nx, ny]) => !grid[ny][nx].revealed && !grid[ny][nx].flagged);
@@ -397,7 +416,7 @@ function markSafe(x, y) {
 function simulateGame(testGrid = null) {
     let simulationGrid = testGrid || JSON.parse(JSON.stringify(grid));
     let previousRevealedCount = 0;
-    
+
     // First, simulate the reveal cascade from already revealed cells
     for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
@@ -406,11 +425,11 @@ function simulateGame(testGrid = null) {
             }
         }
     }
-    
+
     do {
         previousRevealedCount = simulationGrid.flat().filter(cell => cell.revealed).length;
         const markedMines = new Set();
-        
+
         // Find all definite mines first
         for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {
@@ -446,7 +465,7 @@ function simulateGame(testGrid = null) {
         // Count current revealed cells
         const currentRevealedCount = simulationGrid.flat().filter(cell => cell.revealed).length;
         const totalSafeCells = width * height - simulationGrid.flat().filter(cell => cell.mine).length;
-        
+
         if (currentRevealedCount === totalSafeCells) {
             console.log("Simulation shows game can be won through deduction!");
             return true;
@@ -458,7 +477,7 @@ function simulateGame(testGrid = null) {
             console.log("Revealed:", currentRevealedCount, "of", totalSafeCells, "safe cells");
             return false;
         }
-        
+
     } while (true);
 }
 
@@ -467,12 +486,12 @@ function findDefiniteSafeCellsInSimulation(x, y, markedMines, simGrid) {
     const mineCount = countMinesInSimulation(x, y, simGrid);
     const neighbors = getNeighbors(x, y);
     // Remove mine check - only use flags and marked mines
-    const flaggedOrMarkedMines = neighbors.filter(([nx, ny]) => 
-        simGrid[ny][nx].flagged || 
+    const flaggedOrMarkedMines = neighbors.filter(([nx, ny]) =>
+        simGrid[ny][nx].flagged ||
         markedMines.has(`${nx},${ny}`));
-    const unknownNeighbors = neighbors.filter(([nx, ny]) => 
+    const unknownNeighbors = neighbors.filter(([nx, ny]) =>
         !simGrid[ny][nx].revealed && !simGrid[ny][nx].flagged);
-    
+
     if (mineCount === flaggedOrMarkedMines.length && unknownNeighbors.length > 0) {
         unknownNeighbors.forEach(([nx, ny]) => {
             simGrid[ny][nx].safe = true;
@@ -482,7 +501,7 @@ function findDefiniteSafeCellsInSimulation(x, y, markedMines, simGrid) {
     // Add new logic to find cells that must be safe due to mine constraints
     const totalMineCount = numMines;
     const knownMineLocations = new Set();
-    
+
     // Find all cells that must contain mines based on current numbers
     for (let cy = 0; cy < height; cy++) {
         for (let cx = 0; cx < width; cx++) {
@@ -491,7 +510,7 @@ function findDefiniteSafeCellsInSimulation(x, y, markedMines, simGrid) {
                 const possibleMineLocations = getNeighbors(cx, cy)
                     .filter(([nx, ny]) => !simGrid[ny][nx].revealed);
                 if (possibleMineLocations.length === number) {
-                    possibleMineLocations.forEach(([nx, ny]) => 
+                    possibleMineLocations.forEach(([nx, ny]) =>
                         knownMineLocations.add(`${nx},${ny}`));
                 }
             }
@@ -504,8 +523,8 @@ function findDefiniteSafeCellsInSimulation(x, y, markedMines, simGrid) {
         for (let cy = 0; cy < height; cy++) {
             for (let cx = 0; cx < width; cx++) {
                 const key = `${cx},${cy}`;
-                if (!simGrid[cy][cx].revealed && 
-                    !simGrid[cy][cx].flagged && 
+                if (!simGrid[cy][cx].revealed &&
+                    !simGrid[cy][cx].flagged &&
                     !knownMineLocations.has(key)) {
                     simGrid[cy][cx].safe = true;
                 }
@@ -533,9 +552,9 @@ function findDefiniteMinesInSimulation(x, y, markedMines, simGrid) {
     const mineCount = countMinesInSimulation(x, y, simGrid);
     const neighbors = getNeighbors(x, y);
     const flaggedNeighbors = neighbors.filter(([nx, ny]) => simGrid[ny][nx].flagged);
-    const unknownNeighbors = neighbors.filter(([nx, ny]) => 
+    const unknownNeighbors = neighbors.filter(([nx, ny]) =>
         !simGrid[ny][nx].revealed && !simGrid[ny][nx].flagged);
-    
+
     const remainingMines = mineCount - flaggedNeighbors.length;
 
     // Original logic for direct deduction
@@ -555,8 +574,8 @@ function findDefiniteMinesInSimulation(x, y, markedMines, simGrid) {
         // Get all revealed neighbors that share unknown cells with this one
         const revealedNeighbors = getNeighbors(x, y)
             .filter(([nx, ny]) => simGrid[ny][nx].revealed)
-            .map(([nx, ny]) => ({x: nx, y: ny, number: countMinesInSimulation(nx, ny, simGrid)}));
-        
+            .map(([nx, ny]) => ({ x: nx, y: ny, number: countMinesInSimulation(nx, ny, simGrid) }));
+
         // If we have a pattern where N cells must contain M mines
         // and those N cells are the only possible locations for those M mines
         const sharedUnknowns = new Set();
@@ -583,12 +602,12 @@ function showMessage(message) {
     const messageContainer = document.getElementById("message-container");
     const messageElement = document.getElementById("message");
     messageElement.textContent = message;
-    messageContainer.style.display = "block";
+    messageContainer.classList.add('visible');
 }
 
 document.getElementById("try-again-button").addEventListener("click", () => {
     const messageContainer = document.getElementById("message-container");
-    messageContainer.style.display = "none";
+    messageContainer.classList.remove('visible');
 
     // Add animation to flip back the cells
     const cells = document.querySelectorAll(".cell");
@@ -597,30 +616,6 @@ document.getElementById("try-again-button").addEventListener("click", () => {
             cell.classList.remove("revealed");
             if (index === cells.length - 1) {
                 revealedCells = 0;
-                firstClick = true;
-                setTimeout(init, 300); // Restart the game after the animation
-            }
-        }, 10);
-    });
-});
-
-function showMessage(message) {
-    const messageContainer = document.getElementById("message-container");
-    const messageElement = document.getElementById("message");
-    messageElement.textContent = message;
-    messageContainer.style.display = "block";
-}
-
-document.getElementById("try-again-button").addEventListener("click", () => {
-    const messageContainer = document.getElementById("message-container");
-    messageContainer.style.display = "none";
-
-    // Add animation to flip back the cells
-    const cells = document.querySelectorAll(".cell");
-    cells.forEach((cell, index) => {
-        setTimeout(() => {
-            cell.classList.remove("revealed");
-            if (index === cells.length - 1) {
                 firstClick = true;
                 setTimeout(init, 300); // Restart the game after the animation
             }
