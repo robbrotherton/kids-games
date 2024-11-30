@@ -340,23 +340,39 @@ function toggleFlag(x, y, createNewFlag = true, removeFlag = true) {
 
 
 let longPressTimer = null;
+let wasDragging = false;  // Add this flag
+let touchStartTime = 0;   // Add this to track tap duration
 
 function handleLongPressStart(event) {
-    event.preventDefault(); // Prevent native touch events
+    event.preventDefault();
     event.stopPropagation();
     
     const x = +event.currentTarget.dataset.x;
     const y = +event.currentTarget.dataset.y;
+    
+    touchStartTime = Date.now();
+    wasDragging = false;
 
     longPressTimer = setTimeout(() => {
+        wasDragging = true;  // Mark that we triggered the long press
         toggleFlag(x, y);
-    }, 500); // 500ms threshold for long press
+    }, 500);
 }
 
 function handleLongPressEnd(event) {
     event.preventDefault();
     event.stopPropagation();
+    
     clearTimeout(longPressTimer);
+    
+    // If it was a short tap (less than 500ms) and not a drag operation
+    if (Date.now() - touchStartTime < 500 && !wasDragging) {
+        const x = +event.currentTarget.dataset.x;
+        const y = +event.currentTarget.dataset.y;
+        reveal(x, y, 0);
+    }
+    
+    wasDragging = false;
 }
 
 // Add touch handlers for draggable flags
@@ -728,13 +744,13 @@ document.getElementById("try-again-button").addEventListener("click", () => {
     messageContainer.classList.remove('visible');
 
     // Clear all flags immediately
-    grid.forEach(row => row.forEach(cell => {
-        if (cell.flagged) {
-            cell.flagged = false;
-            cell.cell.classList.remove("flagged");
-            cell.cell.querySelector(".cell-front").textContent = "";
-        }
-    }));
+    // grid.forEach(row => row.forEach(cell => {
+    //     if (cell.flagged) {
+    //         cell.flagged = false;
+    //         cell.cell.classList.remove("flagged");
+    //         cell.cell.querySelector(".cell-front").textContent = "";
+    //     }
+    // }));
 
     // Sail away animation
     const gameContainer = document.querySelector('.game-container');
