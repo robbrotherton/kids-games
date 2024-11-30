@@ -661,6 +661,15 @@ document.getElementById("try-again-button").addEventListener("click", () => {
     const messageContainer = document.getElementById("message-container");
     messageContainer.classList.remove('visible');
 
+    // Clear all flags from cells immediately
+    grid.forEach(row => row.forEach(cell => {
+        if (cell.flagged) {
+            cell.flagged = false;
+            cell.cell.classList.remove("flagged");
+            cell.cell.querySelector(".cell-front").textContent = "";
+        }
+    }));
+
     // Add animation to flip back the cells
     const cells = document.querySelectorAll(".cell");
     cells.forEach((cell, index) => {

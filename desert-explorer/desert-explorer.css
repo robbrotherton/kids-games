@@ -83,6 +83,14 @@ main {
     perspective: 500px;
 }
 
+/* Prevent text selection */
+.cell, .flag-container {
+    user-select: none;
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+/Edge */
+}
+
 .cell.revealed {
     cursor: default;
 }
