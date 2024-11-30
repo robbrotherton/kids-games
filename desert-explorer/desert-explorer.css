@@ -237,7 +237,7 @@ main {
     border: none;
     font-size: 2em;
 }
-
+/*
 @media (max-width: 600px) {
     #game {
         grid-template-columns: repeat(8, 30px);
@@ -261,7 +261,7 @@ main {
         height: 20px;
     }
 }
-
+*/
 #bottom-bar {
     position: fixed;
     bottom: 0;
