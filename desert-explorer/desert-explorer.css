@@ -236,7 +236,14 @@ main {
     align-items: center;
     border: none;
     font-size: 2em;
+    touch-action: none; /* Prevent scrolling while dragging */
 }
+
+.cell.drag-over {
+    border: 2px solid #ffd700;
+    transform: scale(1.1);
+}
+
 /*
 @media (max-width: 600px) {
     #game {

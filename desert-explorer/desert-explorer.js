@@ -82,6 +82,10 @@ function init() {
         flag.draggable = true;
         flag.addEventListener('dragstart', handleDragStart);
         flag.addEventListener('dragend', handleDragEnd);
+        // Add touch events for mobile
+        flag.addEventListener('touchstart', handleFlagTouchStart);
+        flag.addEventListener('touchmove', handleFlagTouchMove);
+        flag.addEventListener('touchend', handleFlagTouchEnd);
         
         flagContainer.appendChild(flag);
         flagsRow.appendChild(flagContainer);
@@ -311,6 +315,10 @@ function toggleFlag(x, y, createNewFlag = true, removeFlag = true) {
         newFlag.draggable = true;
         newFlag.addEventListener('dragstart', handleDragStart);
         newFlag.addEventListener('dragend', handleDragEnd);
+        // Add touch events for mobile
+        newFlag.addEventListener('touchstart', handleFlagTouchStart);
+        newFlag.addEventListener('touchmove', handleFlagTouchMove);
+        newFlag.addEventListener('touchend', handleFlagTouchEnd);
         
         flagContainer.appendChild(newFlag);
         flagsRow.appendChild(flagContainer);
@@ -334,6 +342,9 @@ function toggleFlag(x, y, createNewFlag = true, removeFlag = true) {
 let longPressTimer = null;
 
 function handleLongPressStart(event) {
+    event.preventDefault(); // Prevent native touch events
+    event.stopPropagation();
+    
     const x = +event.currentTarget.dataset.x;
     const y = +event.currentTarget.dataset.y;
 
@@ -342,11 +353,59 @@ function handleLongPressStart(event) {
     }, 500); // 500ms threshold for long press
 }
 
-function handleLongPressEnd() {
+function handleLongPressEnd(event) {
+    event.preventDefault();
+    event.stopPropagation();
     clearTimeout(longPressTimer);
 }
 
+// Add touch handlers for draggable flags
+let touchTarget = null;
 
+function handleFlagTouchStart(e) {
+    e.preventDefault();
+    touchTarget = e.target;
+    touchTarget.classList.add('dragging');
+}
+
+function handleFlagTouchMove(e) {
+    if (!touchTarget) return;
+    e.preventDefault();
+    
+    const touch = e.touches[0];
+    const elements = document.elementsFromPoint(touch.clientX, touch.clientY);
+    const cell = elements.find(el => el.classList.contains('cell'));
+    
+    // Highlight potential drop target
+    document.querySelectorAll('.cell').forEach(c => c.classList.remove('drag-over'));
+    if (cell) {
+        cell.classList.add('drag-over');
+    }
+}
+
+function handleFlagTouchEnd(e) {
+    if (!touchTarget) return;
+    e.preventDefault();
+    
+    const touch = e.changedTouches[0];
+    const elements = document.elementsFromPoint(touch.clientX, touch.clientY);
+    const cell = elements.find(el => el.classList.contains('cell'));
+    
+    if (cell) {
+        const x = +cell.dataset.x;
+        const y = +cell.dataset.y;
+        const cellData = grid[y][x];
+        
+        if (!cellData.revealed && !cellData.flagged) {
+            touchTarget.parentElement.remove();
+            toggleFlag(x, y, false, false);
+        }
+    }
+    
+    touchTarget.classList.remove('dragging');
+    document.querySelectorAll('.cell').forEach(c => c.classList.remove('drag-over'));
+    touchTarget = null;
+}
 
 function checkWin() {
     const totalNonMines = width * height - numMines;
