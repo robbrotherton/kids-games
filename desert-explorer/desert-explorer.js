@@ -51,26 +51,46 @@ function init() {
 }
 
 function placeMinesAvoiding(safeX, safeY) {
-    let placedMines = 0;
+    const MAX_ATTEMPTS = 10;
+    let attempts = 0;
+    
+    do {
+        clearMines();
+        let placedMines = 0;
 
-    while (placedMines < numMines) {
-        const x = Math.floor(Math.random() * width);
-        const y = Math.floor(Math.random() * height);
-        const isSafeZone = Math.abs(x - safeX) <= 1 && Math.abs(y - safeY) <= 1;
+        while (placedMines < numMines) {
+            const x = Math.floor(Math.random() * width);
+            const y = Math.floor(Math.random() * height);
+            const isSafeZone = Math.abs(x - safeX) <= 1 && Math.abs(y - safeY) <= 1;
 
-        if (!grid[y][x].mine && !isSafeZone) {
-            grid[y][x].mine = true;
-            // Access the front element correctly through querySelector
-            grid[y][x].cell.querySelector('.cell-front').classList.add('mine');
-            placedMines++;
+            if (!grid[y][x].mine && !isSafeZone) {
+                grid[y][x].mine = true;
+                // grid[y][x].cell.querySelector('.cell-front').classList.add('mine');
+                placedMines++;
+            }
         }
-    }
 
-    // validate the board and retry if not solvable
-    // if (!validateBoard()) {
-    //     clearMines();
-    //     placeMinesAvoiding(safeX, safeY);
-    // }
+        // Reveal first click to test solvability
+        const testGrid = JSON.parse(JSON.stringify(grid));
+        testGrid[safeY][safeX].revealed = true;
+        if (countMines(safeX, safeY) === 0) {
+            // Simulate cascade reveal for zero
+            getNeighbors(safeX, safeY).forEach(([nx, ny]) => {
+                testGrid[ny][nx].revealed = true;
+            });
+        }
+
+        attempts++;
+        if (simulateGame(testGrid)) {
+            console.log(`Found solvable board in ${attempts} attempts`);
+            return true;
+        }
+        console.log(`Attempt ${attempts} failed, retrying...`);
+
+    } while (attempts < MAX_ATTEMPTS);
+
+    console.log(`Failed to find solvable board in ${MAX_ATTEMPTS} attempts`);
+    return false;
 }
 
 function clearMines() {
@@ -299,8 +319,8 @@ function markSafe(x, y) {
     }
 }
 
-function simulateGame() {
-    let simulationGrid = JSON.parse(JSON.stringify(grid));
+function simulateGame(testGrid = null) {
+    let simulationGrid = testGrid || JSON.parse(JSON.stringify(grid));
     let previousRevealedCount = 0;
     
     // First, simulate the reveal cascade from already revealed cells
