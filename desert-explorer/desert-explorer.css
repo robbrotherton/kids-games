@@ -1,5 +1,38 @@
-:root {
-    background-color: #f4e2c4;
+body {
+    background-color: rgb(176, 225, 255);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+}
+
+#header {
+    /* ...existing code... */
+}
+
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#game {
+    position: relative;
+    z-index: 1;
+    background: transparent;
+    /* margin: 0 auto; */
+    display: grid;
+    grid-gap: 3px;
+}
+
+.game-container {  /* Add this wrapper class to your HTML */
+    position: relative;
+    display: inline-block;
+    /* margin: 20px auto; */
+    padding: 20px;
+    /* Remove margin since parent handles centering */
 }
 
 #game {
@@ -10,6 +43,29 @@
     grid-gap: 3px;
     margin: auto;
     /* margin-top: 20px; */
+}
+
+
+.blob-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;  /* Larger to cover game area */
+    height: 400px;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.blob {
+    width: 100%;
+    height: 100%;
+}
+
+.blob path {
+    fill: #f9e8c7;  /* Sandy yellow color */
+    /* filter: blur(30px); */
+    /* opacity: 0.4; */
 }
 
 .cell {
@@ -35,6 +91,7 @@
     color: #555;
     text-align: center;
     line-height: 40px; /* match cell height */
+    background-color: rgba(249, 232, 199, 0.9);
 }
 
 
@@ -67,13 +124,13 @@
 }
 
 .cell-front {
-    background-color: #f9e8c7;
+    background-color: rgba(249, 232, 199, 0.9);
     /* lighter sand */
 }
 
 .cell-back {
     transform: rotateY(180deg);
-    background-color: #e3c98c;
+    background-color: rgba(227, 201, 140, 0.9);
     /* sand */
     color: #4a4a4a;
     /* default number color */
@@ -96,7 +153,8 @@
 }
 
 .cell-back.oasis {
-    background-color: #80bed4;
+    font-size: 2em;
+    background-color: #eedcb8;
     /* oasis blue */
 }
 
