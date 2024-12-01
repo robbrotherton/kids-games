@@ -133,6 +133,13 @@ document.getElementById("checkButton").addEventListener("click", () => {
         const isWin = checkGuess(currentGuess);
         if (isWin) {
             winMessage.textContent = "You win! 🎉";
+
+            confetti({
+                particleCount: 200,
+                spread: 70,
+                origin: { y: 0.9 }
+            });
+            
             return;
         }
         if (++currentRow >= maxAttempts) {
