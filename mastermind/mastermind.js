@@ -15,6 +15,11 @@ const secretCode = Array.from({ length: codeLength }, () =>
 
 // create the game board
 function initBoard() {
+    // Create the indicator first, before any rows
+    const indicator = document.createElement("div");
+    indicator.classList.add("row-indicator");
+    gameBoard.appendChild(indicator);
+
     for (let i = 0; i < maxAttempts; i++) {
         const rowContainer = document.createElement("div");
         rowContainer.classList.add("row-container");
@@ -45,6 +50,8 @@ function initBoard() {
         rowContainer.appendChild(guessContainer);
         rowContainer.appendChild(pegsContainer);
         gameBoard.appendChild(rowContainer);
+
+        // Remove the indicator creation from here (it was in the i === 0 condition)
     }
 }
 
@@ -68,6 +75,12 @@ function handleColorClick(colorBtn) {
             nextSlot.style.backgroundColor = colorBtn.dataset.color;
             nextSlot.classList.add("filled");
             currentGuess.push(colorBtn.dataset.color);
+            
+            // Add this: Toggle active class when guess is complete
+            const checkButton = document.getElementById("checkButton");
+            if (currentGuess.length === codeLength) {
+                checkButton.classList.add("active");
+            }
         }
     }
 }
@@ -95,8 +108,9 @@ function checkGuess(guess) {
         }
     });
 
-    // Update pegs
-    const pegsContainer = gameBoard.children[currentRow].querySelector(".pegs-container");
+    // Update pegs - Fix the selector to skip the indicator
+    const rowContainers = gameBoard.getElementsByClassName('row-container');
+    const pegsContainer = rowContainers[currentRow].querySelector(".pegs-container");
     const pegs = pegsContainer.children;
     let pegIndex = 0;
     
@@ -125,7 +139,12 @@ document.getElementById("checkButton").addEventListener("click", () => {
             winMessage.textContent = `Game over! The code was: ${secretCode.join(", ")}`;
             return;
         }
+        // Move indicator and reset button state
+        const indicator = document.querySelector(".row-indicator");
+        const rowHeight = 60; // height of a row (50px) + gap (10px)
+        indicator.style.transform = `translateY(${currentRow * rowHeight}px)`;
         currentGuess = [];
+        document.getElementById("checkButton").classList.remove("active"); // Add this
     } else {
         feedback.textContent = "Please fill all slots before checking!";
     }

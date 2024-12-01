@@ -7,9 +7,8 @@
   <link rel="stylesheet" href="../styles.css">
   <link rel="stylesheet" href="mastermind.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Rye&display=swap" rel="stylesheet">
-
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baumans&family=Just+Another+Hand&family=Trade+Winds&display=swap" rel="stylesheet">
   <title>Mastermind</title>
 
 </head>
@@ -18,16 +17,18 @@
   <div id="header">
     <button id="back-button" type="button" title="Go back" onclick="window.location.href='../index.html'"><img
       src="../assets/back-arrow.png" alt="Back"></button>
-    <h1 id="game-title"><span class="rye-regular">Mastermind</span></h1>
+    <h1 id="game-title"><span class="baumans-regular">MASTERMIND</span></h1>
     <button id="settings-button" onclick="openSettings()"><img src="../assets/settings-gear.png"
         alt="Settings"></button>
   </div>
   <div id="game" class="game">
   <div class="board" id="gameBoard"></div>
   <div class="controls" id="colorControls"></div>
-  <button id="checkButton">Check Guess</button>
   <div class="feedback" id="feedback"></div>
   <div class="win-message" id="winMessage"></div>
+</div>
+<div id="footer">
+    <button id="checkButton" class="check-button baumans-regular">CHECK GUESS</button>
 </div>
 
   <script src="mastermind.js"></script>
