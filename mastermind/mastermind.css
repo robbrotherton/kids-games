@@ -23,12 +23,14 @@ body {
 }
 
 #game {
-    height: 80vh;
+    flex: 1;  /* Changed from height: 80vh */
     display: flex;
     flex-direction: column;
     align-items: center;
-    overflow-y: hidden;
+    overflow-y: auto;  /* Changed from hidden to allow scrolling if needed */
     padding: 20px 0;
+    position: relative;  /* Add this for proper child positioning */
+    padding-bottom: 100px; /* Add space for controls at bottom */
 }
 
 #footer {
@@ -46,12 +48,14 @@ body {
     flex-direction: column;
     gap: 10px;
     align-items: center;
-    margin: 0 auto; /* Change from margin: 20px auto */
-    position: relative; /* Add this */
-    width: fit-content; /* Add this */
+    margin: auto; /* Centers vertically and horizontally */
+    position: relative;
+    width: fit-content;
     padding: 20px;
     background-color: rgba(255, 255, 255, 0.9);
     border-radius: 10px;
+    max-height: calc(100vh - 10vh - 10vh - 100px - 40px); /* Adjust height calculation to account for header, footer, controls, and padding */
+    overflow-y: auto; /* Allow board to scroll if it gets too tall */
 }
 
 .slot {
@@ -70,6 +74,14 @@ body {
     justify-content: center;
     gap: 10px;
     margin-top: 20px;
+    position: fixed;  /* Change from sticky to fixed */
+    bottom: 10vh;    /* Position just above footer */
+    left: 0;
+    background-color: rgb(77, 77, 77); /* Match body background */
+    padding: 20px;
+    width: 100%;
+    z-index: 1;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
 }
 
 .color {
