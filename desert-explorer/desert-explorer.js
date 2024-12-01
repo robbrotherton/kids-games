@@ -1,11 +1,19 @@
-const width = 4;
-const height = 4;
-const numMines = 4;
+const DIFFICULTY_SETTINGS = {
+    easy: { width: 5, height: 4, numMines: 4 },
+    medium: { width: 6, height: 5, numMines: 7 },
+    hard: { width: 8, height: 6, numMines: 12 }
+};
+
+let currentDifficulty = 'easy';
+let width = DIFFICULTY_SETTINGS[currentDifficulty].width;
+let height = DIFFICULTY_SETTINGS[currentDifficulty].height;
+let numMines = DIFFICULTY_SETTINGS[currentDifficulty].numMines;
 
 const game = document.getElementById("game");
 let grid = [];
 let firstClick = true;
 let revealedCells = 0;
+let settingsVisible = false;
 
 function generateBlobPoints(numPoints = 30, radius = 100) {  // increased points
     const points = [];
@@ -56,6 +64,27 @@ function createBlobPath(points) {
 }
 
 function init() {
+    // Calculate cell size based on difficulty
+    const cellSize = Math.min(40, Math.floor(320 / Math.max(width, height))); // 320px is example max game area
+    const fontSize = Math.max(1, cellSize / 24); // Scale font with cell size
+    
+    const style = document.createElement('style');
+    style.textContent = `
+        .cell {
+            width: ${cellSize}px;
+            height: ${cellSize}px;
+            font-size: ${fontSize}em;
+        }
+        .cell-front, .cell-back {
+            line-height: ${cellSize}px;
+        }
+        .flag-container {
+            width: ${cellSize}px;
+            height: ${cellSize}px;
+        }
+    `;
+    document.head.appendChild(style);
+
     // Ensure container starts in correct position if this is first run
     const gameContainer = document.querySelector('.game-container');
     if (gameContainer && !gameContainer.classList.contains('ready')) {
@@ -116,7 +145,7 @@ function init() {
 
     // start from scratch on reset
     game.innerHTML = '';
-    game.style = `grid-template-columns: repeat( ${width}, 40px);`;
+    game.style = `grid-template-columns: repeat( ${width}, ${cellSize}px);`;
     grid = [];
     // clearMines();
 
@@ -827,5 +856,77 @@ function handleDrop(e, x, y) {
         toggleFlag(x, y, false, false); // Don't create new flag and don't remove another flag
     }
 }
+
+function openSettings() {
+    const overlay = document.getElementById('settings-overlay');
+    settingsVisible = !settingsVisible;
+    
+    if (settingsVisible) {
+        overlay.classList.add('visible');
+    } else {
+        overlay.classList.remove('visible');
+    }
+}
+
+// Add click handler to close settings when clicking outside
+document.getElementById('settings-overlay').addEventListener('click', (e) => {
+    if (e.target.id === 'settings-overlay') {
+        settingsVisible = false;
+        e.target.classList.remove('visible');
+    }
+});
+
+// Add new function to handle difficulty changes
+function changeDifficulty(difficulty) {
+    currentDifficulty = difficulty;
+    width = DIFFICULTY_SETTINGS[difficulty].width;
+    height = DIFFICULTY_SETTINGS[difficulty].height;
+    numMines = DIFFICULTY_SETTINGS[difficulty].numMines;
+    
+    // Clear current game state
+    revealedCells = 0;
+    firstClick = true;
+    grid = [];
+    
+    // Clear existing flags
+    const flagsRow = document.querySelector('.flags-row');
+    if (flagsRow) {
+        flagsRow.innerHTML = ''; // Remove all existing flags
+    }
+    
+    // Update game board
+    const gameContainer = document.querySelector('.game-container');
+    gameContainer.classList.remove('ready');
+    gameContainer.classList.add('sailing-out');
+
+    setTimeout(() => {
+        gameContainer.style.transition = 'none';
+        gameContainer.classList.remove('sailing-out');
+        gameContainer.classList.add('sailing-in');
+        
+        void gameContainer.offsetHeight;
+        gameContainer.style.transition = '';
+
+        // Initialize new game with updated settings
+        init();
+
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                gameContainer.classList.remove('sailing-in');
+                gameContainer.classList.add('ready');
+            });
+        });
+    }, 800);
+}
+
+// Add event listeners for difficulty radio buttons
+document.querySelectorAll('.difficulty-options input[type="radio"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+        changeDifficulty(e.target.value);
+        // Close settings panel
+        settingsVisible = false;
+        document.getElementById('settings-overlay').classList.remove('visible');
+    });
+});
 
 init();
