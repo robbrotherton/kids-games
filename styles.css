@@ -38,6 +38,12 @@ body {
   font-style: normal;
 }
 
+.baumans-bold {
+  font-family: "Baumans", system-ui;
+  font-weight: 900;
+  font-style: normal;
+}
+
 
 #header {
   display: flex;

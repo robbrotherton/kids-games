@@ -127,16 +127,55 @@ function checkGuess(guess) {
     return exactMatches === codeLength;
 }
 
-// Modify check button event listener
-document.getElementById("checkButton").addEventListener("click", () => {
+function resetGame() {
+    // Reset game state
+    currentGuess = [];
+    currentRow = 0;
+    
+    // Generate new secret code
+    secretCode.length = 0;
+    secretCode.push(...Array.from({ length: codeLength }, () => 
+        colors[Math.floor(Math.random() * colors.length)]
+    ));
+    
+    // Clear the board
+    gameBoard.innerHTML = '';
+    colorControls.innerHTML = '';
+    
+    // Reset the footer
+    document.getElementById("footer").innerHTML = `
+        <button id="checkButton" class="check-button baumans-regular">CHECK GUESS</button>
+    `;
+    
+    // Add check button listener
+    document.getElementById("checkButton").addEventListener("click", handleCheckButton);
+    
+    // Reinitialize the game
+    initBoard();
+    initColorControls();
+}
+
+// Extract check button logic to reusable function
+function handleCheckButton() {
     if (currentGuess.length === codeLength) {
         const isWin = checkGuess(currentGuess);
         if (isWin) {
-            winMessage.textContent = "You win! 🎉";
+            const footer = document.getElementById("footer");
+            const numGuesses = currentRow + 1;
+            
+            footer.innerHTML = `
+                <div class="win-container">
+                    <div class="win-message baumans-regular">YOU WON IN ${numGuesses} ${numGuesses === 1 ? 'GUESS' : 'GUESSES'}! <button id="try-again-button"><img src="../assets/refresh-button.png"></button></div>
+                </div>
+            `;
+
+            // Add click handler to try-again button
+            document.getElementById("try-again-button").addEventListener("click", resetGame);
 
             confetti({
                 particleCount: 200,
-                spread: 70,
+                spread: 50,
+                // height: 100,
                 origin: { y: 0.9 }
             });
             
@@ -155,7 +194,10 @@ document.getElementById("checkButton").addEventListener("click", () => {
     } else {
         feedback.textContent = "Please fill all slots before checking!";
     }
-});
+}
+
+// Replace the anonymous check button listener with named function
+document.getElementById("checkButton").addEventListener("click", handleCheckButton);
 
 // Initialize the game
 initBoard();

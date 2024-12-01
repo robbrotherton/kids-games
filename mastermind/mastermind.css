@@ -4,6 +4,7 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    font-family: Baumans;
 }
 
 #header {
@@ -79,20 +80,9 @@ body {
     border: 2px solid #000;
 }
 
-.feedback {
-    margin-top: 10px;
-    font-size: 14px;
-}
 
 .hidden-code {
     display: none;
-}
-
-.win-message {
-    margin-top: 20px;
-    font-size: 18px;
-    color: green;
-    font-weight: bold;
 }
 
 .row-container {
@@ -108,7 +98,7 @@ body {
     height: 60px;  /* Set explicit height */
     top: 15px;  /* Adjust to align with first row */
     /* left: -10px; */
-    background-color: rgba(255, 255, 0, 0.2);
+    background-color: rgba(99, 190, 127, 0.2);
     border-radius: 8px;
     pointer-events: none;
     transition: transform 0.3s ease;
@@ -173,4 +163,39 @@ body {
 .check-button:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
+}
+
+.win-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.win-container .win-message {
+    font-size: 2em;
+    font-weight: 900;
+    color: black;
+    margin: 0;
+}
+
+.win-message img {
+    height: 2em;
+}
+
+.replay-button {
+    padding: 12px 24px;
+    font-size: 1.2em;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.replay-button:hover {
+    background-color: #45a049;
+    transform: scale(1.05);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
