@@ -1,15 +1,36 @@
 const board = document.getElementById("game");
 
-// initial board configuration: 7x7 grid with nulls as invalid spaces
-const initialState = [
-    [null, null, 1, 1, 1, null, null],
-    [null, null, 1, 1, 1, null, null],
-    [1, 1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 0, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1],
-    [null, null, 1, 1, 1, null, null],
-    [null, null, 1, 1, 1, null, null],
-];
+// Add these new configurations at the top after the original initialState
+const boardConfigs = {
+    cross: {
+        name: "Cross (7x7)",
+        state: [
+            [null, null, 1, 1, 1, null, null],
+            [null, null, 1, 1, 1, null, null],
+            [1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 0, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1],
+            [null, null, 1, 1, 1, null, null],
+            [null, null, 1, 1, 1, null, null],
+        ]
+    },
+    triangle: {
+        name: "Triangle (5 rows)",
+        // Only solvable when starting with empty position (0) at:
+        // - Center of bottom row (current)
+        // - Any of the three corners
+        state: [
+            [1, null, null, null, null],  // Top corner
+            [1, 1, null, null, null],
+            [1, 1, 1, null, null],
+            [1, 1, 1, 1, null],
+            [1, 1, 0, 1, 1]               // Bottom center
+        ]
+    }
+};
+
+const initialState = boardConfigs.triangle.state;
+let currentConfig = 'triangle';
 
 let state = JSON.parse(JSON.stringify(initialState)); // deep copy
 
@@ -17,14 +38,11 @@ let state = JSON.parse(JSON.stringify(initialState)); // deep copy
 function drawBoard() {
     board.innerHTML = ""; // clear previous board
     state.forEach((row, rowIndex) => {
+        const rowContainer = document.createElement("div");
+        rowContainer.className = "row";
+        
         row.forEach((cell, colIndex) => {
-            if (cell === null) {
-                const placeholder = document.createElement("div");
-                placeholder.style.width = "50px";
-                placeholder.style.height = "50px";
-                board.appendChild(placeholder);
-                return;
-            }
+            if (cell === null) return; // Skip null cells instead of creating placeholder
 
             const hole = document.createElement("div");
             hole.classList.add("hole");
@@ -39,8 +57,10 @@ function drawBoard() {
                 hole.appendChild(peg);
             }
 
-            board.appendChild(hole);
+            rowContainer.appendChild(hole);
         });
+        
+        board.appendChild(rowContainer);
     });
 }
 
@@ -164,16 +184,15 @@ function hasValidMovesRemaining() {
         for (let fromCol = 0; fromCol < state[0].length; fromCol++) {
             if (state[fromRow][fromCol] !== 1) continue;
             
-            // Check all possible jump directions
-            const directions = [
-                [0, 2], [0, -2], [2, 0], [-2, 0]
-            ];
+            // Check all possible jump directions based on layout
+            const directions = currentConfig === 'triangle' ?
+                [[0, 2], [0, -2], [2, 0], [-2, 0], [2, 2], [-2, -2]] : // Include diagonals for triangle
+                [[0, 2], [0, -2], [2, 0], [-2, 0]];                     // Only orthogonal for cross
             
             for (const [dRow, dCol] of directions) {
                 const toRow = fromRow + dRow;
                 const toCol = fromCol + dCol;
                 
-                // Check bounds before validating move
                 if (toRow >= 0 && toRow < state.length && 
                     toCol >= 0 && toCol < state[0].length) {
                     if (isValidMove(fromRow, fromCol, toRow, toCol)) {
@@ -224,14 +243,61 @@ function isValidMove(fromRow, fromCol, toRow, toCol) {
     const dRow = Math.abs(toRow - fromRow);
     const dCol = Math.abs(toCol - fromCol);
 
-    if ((dRow === 2 && dCol === 0) || (dRow === 0 && dCol === 2)) {
+    // Allow diagonal moves only for triangle layout
+    const isDiagonal = dRow === 2 && dCol === 2;
+    const isOrthogonal = (dRow === 2 && dCol === 0) || (dRow === 0 && dCol === 2);
+    
+    if (currentConfig === 'triangle' ? (isOrthogonal || isDiagonal) : isOrthogonal) {
         const jumpedRow = (fromRow + toRow) / 2;
         const jumpedCol = (fromCol + toCol) / 2;
-        return state[jumpedRow][jumpedCol] === 1; // must jump over a peg
+        return state[jumpedRow][jumpedCol] === 1;
     }
 
     return false;
 }
+
+function openSettings() {
+    const modal = document.createElement('div');
+    modal.className = 'settings-modal';
+    
+    const content = document.createElement('div');
+    content.className = 'settings-content';
+    
+    const title = document.createElement('h2');
+    title.textContent = 'Game Settings';
+    content.appendChild(title);
+    
+    const layoutSelect = document.createElement('div');
+    layoutSelect.className = 'layout-select';
+    
+    Object.entries(boardConfigs).forEach(([key, config]) => {
+        const option = document.createElement('button');
+        option.className = `layout-option ${key === currentConfig ? 'selected' : ''}`;
+        option.textContent = config.name;
+        option.onclick = () => {
+            currentConfig = key;
+            state = JSON.parse(JSON.stringify(boardConfigs[key].state));
+            if (key === 'triangle') {
+                board.classList.add('triangle-mode');
+            } else {
+                board.classList.remove('triangle-mode');
+            }
+            drawBoard();
+            modal.remove();
+        };
+        layoutSelect.appendChild(option);
+    });
+    
+    content.appendChild(layoutSelect);
+    modal.appendChild(content);
+    document.body.appendChild(modal);
+    
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+    });
+}
+
+board.classList.add('triangle-mode');
 
 // initial draw
 drawBoard();
