@@ -325,6 +325,13 @@ function toggleFlag(x, y, createNewFlag = true, removeFlag = true) {
     const cellData = grid[y][x];
     if (cellData.revealed) return;
 
+    const totalFlags = grid.flat().filter(cell => cell.flagged).length;
+
+    // Prevent adding more flags than the number of mines
+    if (!cellData.flagged && totalFlags >= numMines) {
+        return;
+    }
+
     // If we're setting a flag, remove one from the flags row (unless told not to)
     if (!cellData.flagged && removeFlag) {
         const flagsRow = document.querySelector('.flags-row');
