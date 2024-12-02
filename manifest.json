@@ -1,20 +1,23 @@
 {
-  "name": "My Game App",
-  "short_name": "GameApp",
-  "start_url": "/",
+  "name": "Games",
+  "short_name": "Games",
+  "start_url": "/kids-games/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
+  "scope": "/kids-games/",
   "icons": [
     {
       "src": "assets/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "assets/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
