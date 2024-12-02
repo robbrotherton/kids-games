@@ -1,5 +1,6 @@
 body {
-    background-color: rgb(77, 77, 77);
+    /* background-color: rgb(77, 77, 77); */
+    background-color: var(--mastermind-bg-color);
     /* margin: 0; */
     /* min-height: 100vh; */
     /* display: flex; */
@@ -9,6 +10,7 @@ body {
 
 #header {
     background-color: rgb(243, 243, 243);
+    color: var(--mastermind-accent-color);
 }
 
 #game-title span {
@@ -142,7 +144,7 @@ body {
 }
 
 .check-button {
-    padding: 12px 24px;
+    padding: 10px 24px;
     font-size: 1.2em;
     background-color: #cccccc;  /* Changed to gray by default */
     color: rgba(255, 255, 255, 0.7);  /* Dimmed text */

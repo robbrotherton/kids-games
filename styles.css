@@ -59,6 +59,12 @@ body {
 }
 
 
+:root {
+  --mastermind-bg-color: rgb(77, 77, 77);
+  --mastermind-fg-color: rgb(243, 243, 243);
+  --mastermind-accent-color: #4e8d50;
+}
+
 
 /************ fonts  *************/
 .rye-regular {
