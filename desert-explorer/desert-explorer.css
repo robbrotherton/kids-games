@@ -1,12 +1,5 @@
 body {
     background-color: rgb(176, 225, 255);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    margin: 0;
-    padding: 0;
-    max-width: 100vw;
-    overflow-x: hidden;
 }
 
 #header {
@@ -18,19 +11,22 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
+    /* height: 80%; */
 }
 
 #game {
-    position: relative;
+    /* position: relative; */
     z-index: 1;
     background: transparent;
     /* margin: 0 auto; */
     display: grid;
     grid-gap: 3px;
-    height: 80%;
+    /* height: 80%; */
 }
 
 .game-container {  /* Add this wrapper class to your HTML */
+    width: max-content;
     position: relative;
     display: inline-block;
     /* margin: 20px auto; */
@@ -56,12 +52,14 @@ main {
 }
 
 #game {
-    max-width: 80%;
+    width: max-content;
+    height: max-content;
     justify-content: center;
     display: grid;
     /* grid-template-columns: repeat(8, 40px); */
     grid-gap: 1px;
     margin: auto;
+    overflow: hidden;
     /* margin-top: 20px; */
 }
 
