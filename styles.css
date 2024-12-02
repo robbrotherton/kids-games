@@ -13,6 +13,53 @@ body {
   overflow-x: hidden;
 }
 
+
+
+
+#header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 7vh;
+  padding: 0 10px;
+  background-color: #d2b48c;
+  /* sand color */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+#bottom-bar {
+  width: 100vw;
+  height: 7vh;
+}
+
+#header img {
+  width: 1.5em;
+}
+
+#back-button,
+#settings-button {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+#game-title {
+  font-size: 2em;
+  text-align: center;
+  flex-grow: 1;
+}
+#message-container {
+  text-align: center;
+}
+#try-again-button {
+  background: none;
+  border: none;
+}
+
+
+
 /************ fonts  *************/
 .rye-regular {
   font-family: "Rye", serif;
@@ -42,41 +89,4 @@ body {
   font-family: "Baumans", system-ui;
   font-weight: 900;
   font-style: normal;
-}
-
-
-#header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  height: 10vh;
-  padding: 0 10px;
-  background-color: #d2b48c;
-  /* sand color */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-#header img {
-  width: 1.5em;
-}
-
-#back-button,
-#settings-button {
-  background: none;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-}
-#game-title {
-  font-size: 2em;
-  text-align: center;
-  flex-grow: 1;
-}
-#message-container {
-  text-align: center;
-}
-#try-again-button {
-  background: none;
-  border: none;
 }
