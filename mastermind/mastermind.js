@@ -29,7 +29,7 @@ function initBoard() {
         const guessContainer = document.createElement("div");
         guessContainer.classList.add("guess-container");
         guessContainer.style.display = "flex";
-        guessContainer.style.gap = "10px";
+        guessContainer.style.gap = "2px";
         
         for (let j = 0; j < codeLength; j++) {
             const slot = document.createElement("div");
@@ -161,7 +161,7 @@ function handleCheckButton() {
     if (currentGuess.length === codeLength) {
         const isWin = checkGuess(currentGuess);
         if (isWin) {
-            const footer = document.getElementById("footer");
+            const footer = document.getElementById("bottom-bar");
             const numGuesses = currentRow + 1;
             
             footer.innerHTML = `
