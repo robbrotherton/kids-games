@@ -1,7 +1,7 @@
 const DIFFICULTY_SETTINGS = {
     easy: { width: 5, height: 4, numMines: 4 },
-    medium: { width: 6, height: 5, numMines: 7 },
-    hard: { width: 8, height: 6, numMines: 12 }
+    medium: { width: 6, height: 6, numMines: 7 },
+    hard: { width: 8, height: 8, numMines: 12 }
 };
 
 let currentDifficulty = 'easy';
@@ -15,53 +15,7 @@ let firstClick = true;
 let revealedCells = 0;
 let settingsVisible = false;
 
-function generateBlobPoints(numPoints = 30, radius = 100) {  // increased points
-    const points = [];
-    const baseJitter = 0.5;  // base randomness
-    const waveFreq = 100;      // how many small waves to add
-    const waveAmp = 0.01;    // how pronounced the waves are
 
-    for (let i = 0; i < numPoints; i++) {
-        const angle = (i / numPoints) * Math.PI * 2;
-        // Add multiple layers of randomness
-        const mainJitter = (Math.random() - 0.5) * baseJitter;
-        const wave = Math.sin(angle * waveFreq) * waveAmp;
-        const r = radius * (1 + mainJitter + wave);
-
-        // Add slight x/y variation for more natural look
-        const xOffset = (Math.random() - 0.5) * 10;
-        const yOffset = (Math.random() - 0.5) * 10;
-
-        points.push({
-            x: Math.cos(angle) * r + radius * 1.2 + xOffset,
-            y: Math.sin(angle) * r + radius * 1.2 + yOffset
-        });
-    }
-    return points;
-}
-
-function createBlobPath(points) {
-    const smooth = 0.3;  // reduced for smoother transitions
-    let path = `M ${points[0].x},${points[0].y}`;
-
-    // Create smoother curves by using more control points
-    for (let i = 0; i < points.length; i++) {
-        const p0 = points[(i - 1 + points.length) % points.length];
-        const p1 = points[i];
-        const p2 = points[(i + 1) % points.length];
-        const p3 = points[(i + 2) % points.length];
-
-        // Use four points to calculate control points
-        const cp1x = p1.x + (p2.x - p0.x) * smooth;
-        const cp1y = p1.y + (p2.y - p0.y) * smooth;
-        const cp2x = p2.x - (p3.x - p1.x) * smooth;
-        const cp2y = p2.y - (p3.y - p1.y) * smooth;
-
-        path += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${p2.x},${p2.y}`;
-    }
-
-    return path + 'Z';
-}
 
 function init() {
     // Calculate cell size based on difficulty
@@ -91,34 +45,31 @@ function init() {
         gameContainer.classList.add('ready');
     }
     
-    // Create flags row container and flags only if they don't exist
-    let flagsRow = document.querySelector('.flags-row');
-    if (!flagsRow) {
-        flagsRow = document.createElement('div');
-        flagsRow.className = 'flags-row';
-        game.parentElement.insertBefore(flagsRow, game);
-    }
-    
-    // Add any missing flags up to numMines
-    const existingFlags = flagsRow.querySelectorAll('.flag-container').length;
-    for (let i = existingFlags; i < numMines; i++) {
-        const flagContainer = document.createElement('div');
-        flagContainer.className = 'flag-container';
-        
-        const flag = document.createElement('div');
-        flag.className = 'draggable-flag';
-        flag.textContent = 'x';
-        flag.draggable = true;
-        flag.addEventListener('dragstart', handleDragStart);
-        flag.addEventListener('dragend', handleDragEnd);
-        // Add touch events for mobile
-        flag.addEventListener('touchstart', handleFlagTouchStart);
-        flag.addEventListener('touchmove', handleFlagTouchMove);
-        flag.addEventListener('touchend', handleFlagTouchEnd);
-        
-        flagContainer.appendChild(flag);
-        flagsRow.appendChild(flagContainer);
-    }
+    // Setup bottom bar with both flag controls and message container
+    const bottomBar = document.getElementById('bottom-bar');
+    bottomBar.innerHTML = `
+        <div class="flag-controls">
+            <div class="flag-container">
+                <div class="draggable-flag" draggable="true">x</div>
+            </div>
+            <span class="flags-remaining">${numMines}</span>
+        </div>
+        <div class="message-container" id="message-container">
+            <div id="message"></div>
+            <button id="try-again-button"><img src="../assets/refresh-button.png"></button>
+        </div>
+    `;
+
+    // Reattach try-again click handler since we recreated the button
+    document.getElementById("try-again-button").addEventListener("click", handleTryAgain);
+
+    // Add event listeners to the single flag
+    const flag = bottomBar.querySelector('.draggable-flag');
+    flag.addEventListener('dragstart', handleDragStart);
+    flag.addEventListener('dragend', handleDragEnd);
+    flag.addEventListener('touchstart', handleFlagTouchStart);
+    flag.addEventListener('touchmove', handleFlagTouchMove);
+    flag.addEventListener('touchend', handleFlagTouchEnd);
 
     // Create blob container if it doesn't exist
     let blobContainer = document.querySelector('.blob-container');
@@ -130,15 +81,17 @@ function init() {
 
         blobContainer = document.createElement('div');
         blobContainer.className = 'blob-container';
-        gameContainer.appendChild(blobContainer);
+        gameContainer.parentElement.appendChild(blobContainer);
     }
 
-    // Generate new blob with adjusted size
-    const blobPoints = generateBlobPoints(8, 120);
+    // Simplified blob generation
+    const { points: blobPoints, width: blobWidth, height: blobHeight } = generateBlobPoints(width, height);
     const blobPath = createBlobPath(blobPoints);
 
     blobContainer.innerHTML = `
-        <svg viewBox="0 0 300 300" class="blob" preserveAspectRatio="xMidYMid meet">
+        <svg viewBox="0 0 ${blobWidth} ${blobHeight}" 
+             class="blob" 
+             preserveAspectRatio="xMidYMid meet">
             <path d="${blobPath}" />
         </svg>
     `;
@@ -190,7 +143,7 @@ function init() {
 }
 
 function placeMinesAvoiding(safeX, safeY) {
-    const MAX_ATTEMPTS = 50;
+    const MAX_ATTEMPTS = 500;
     let attempts = 0;
 
     do {
@@ -302,7 +255,7 @@ function reveal(x, y, delay) {
             back.innerHTML = "<img src='treasure-chest.png'>";
             back.classList.add("mine");
             //   alert("game over!");
-            if (delay === 0) showMessage("You found some treasure!");
+            if (delay === 0) showMessage("Ye found some treasure!");
 
             return;
         }
@@ -326,52 +279,32 @@ function toggleFlag(x, y, createNewFlag = true, removeFlag = true) {
     if (cellData.revealed) return;
 
     const totalFlags = grid.flat().filter(cell => cell.flagged).length;
+    const flagsRemainingEl = document.querySelector('.flags-remaining');
 
     // Prevent adding more flags than the number of mines
     if (!cellData.flagged && totalFlags >= numMines) {
         return;
     }
 
-    // If we're setting a flag, remove one from the flags row (unless told not to)
-    if (!cellData.flagged && removeFlag) {
-        const flagsRow = document.querySelector('.flags-row');
-        const firstFlagContainer = flagsRow.querySelector('.flag-container');
-        if (firstFlagContainer) {
-            firstFlagContainer.remove();
-        }
-    } else if (createNewFlag) {
-        // Create new flag container when unflagging
-        const flagsRow = document.querySelector('.flags-row');
-        const flagContainer = document.createElement('div');
-        flagContainer.className = 'flag-container';
-        
-        const newFlag = document.createElement('div');
-        newFlag.className = 'draggable-flag';
-        newFlag.textContent = 'x';
-        newFlag.draggable = true;
-        newFlag.addEventListener('dragstart', handleDragStart);
-        newFlag.addEventListener('dragend', handleDragEnd);
-        // Add touch events for mobile
-        newFlag.addEventListener('touchstart', handleFlagTouchStart);
-        newFlag.addEventListener('touchmove', handleFlagTouchMove);
-        newFlag.addEventListener('touchend', handleFlagTouchEnd);
-        
-        flagContainer.appendChild(newFlag);
-        flagsRow.appendChild(flagContainer);
-    }
-
     cellData.flagged = !cellData.flagged;
+
+    // Update flags remaining counter
+    if (cellData.flagged) {
+        flagsRemainingEl.textContent = numMines - totalFlags - 1;
+    } else {
+        flagsRemainingEl.textContent = numMines - totalFlags + 1;
+    }
 
     if (cellData.flagged) {
         cellData.cell.classList.add("flagged");
-        cellData.cell.querySelector(".cell-front").textContent = "x"; // add flag icon
+        cellData.cell.querySelector(".cell-front").textContent = "x";
     } else {
         cellData.cell.classList.remove("flagged");
-        cellData.cell.querySelector(".cell-front").textContent = ""; // remove flag icon
+        cellData.cell.querySelector(".cell-front").textContent = "";
     }
 
     progressiveValidator();
-    checkWin(); // reevaluate win condition
+    checkWin();
 }
 
 
@@ -449,7 +382,7 @@ function handleFlagTouchEnd(e) {
         const cellData = grid[y][x];
         
         if (!cellData.revealed && !cellData.flagged) {
-            touchTarget.parentElement.remove();
+            touchTarget.classList.remove('dragging');
             toggleFlag(x, y, false, false);
         }
     }
@@ -466,6 +399,11 @@ function checkWin() {
     const allRevealed = revealedCells === totalNonMines;
 
     if (correctlyFlaggedMines === numMines && totalFlags === numMines) {
+        const messageContainer = document.getElementById("message-container");
+        if (messageContainer && messageContainer.classList.contains('visible')) {
+            return;
+        }
+        
         showMessage("Yarrr! You found all the treasure!");
 
         // Reveal all flagged mine cells with a delay effect
@@ -484,6 +422,7 @@ function checkWin() {
         confetti({
             particleCount: 200,
             spread: 70,
+            startVelocity: 55,
             origin: { y: 0.9 }
         });
     }
@@ -771,65 +710,12 @@ function findDefiniteMinesInSimulation(x, y, markedMines, simGrid) {
 function showMessage(message) {
     const messageContainer = document.getElementById("message-container");
     const messageElement = document.getElementById("message");
+    const flagControls = document.querySelector('.flag-controls');
+    
     messageElement.textContent = message;
-    messageContainer.classList.add('visible');
+    flagControls.style.display = 'none';
+    messageContainer.style.display = 'flex';
 }
-
-document.getElementById("try-again-button").addEventListener("click", () => {
-    const messageContainer = document.getElementById("message-container");
-    messageContainer.classList.remove('visible');
-
-    // Clear all flags immediately
-    // grid.forEach(row => row.forEach(cell => {
-    //     if (cell.flagged) {
-    //         cell.flagged = false;
-    //         cell.cell.classList.remove("flagged");
-    //         cell.cell.querySelector(".cell-front").textContent = "";
-    //     }
-    // }));
-
-    // Sail away animation
-    const gameContainer = document.querySelector('.game-container');
-    gameContainer.classList.remove('ready');
-    gameContainer.classList.add('sailing-out');
-
-    // After sailing out, prepare new game
-    setTimeout(() => {
-        // Temporarily disable transitions
-        gameContainer.style.transition = 'none';
-        
-        // Instantly move to right side of screen
-        gameContainer.classList.remove('sailing-out');
-        gameContainer.classList.add('sailing-in');
-        
-        // Force reflow
-        void gameContainer.offsetHeight;
-        
-        // Re-enable transitions
-        gameContainer.style.transition = '';
-
-        // Reset the grid state
-        revealedCells = 0;
-        firstClick = true;
-
-        // Create new game board
-        const flagsRow = document.querySelector('.flags-row');
-        if (flagsRow) {
-            // ...existing flag reset code...
-        }
-
-        // Initialize new game
-        init();
-
-        // Start sail in animation after a tiny delay
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                gameContainer.classList.remove('sailing-in');
-                gameContainer.classList.add('ready');
-            });
-        });
-    }, 800);
-});
 
 // Add these new drag and drop handler functions
 function handleDragStart(e) {
@@ -855,12 +741,9 @@ function handleDrop(e, x, y) {
     const cellData = grid[y][x];
     
     if (!cellData.revealed && !cellData.flagged) {
-        // Remove the entire flag container, not just the draggable flag
-        const draggedFlag = document.querySelector('.draggable-flag.dragging');
-        if (draggedFlag) {
-            draggedFlag.parentElement.remove(); // Remove the container
-        }
-        toggleFlag(x, y, false, false); // Don't create new flag and don't remove another flag
+        // Don't remove the flag from the bottom bar, just remove dragging class
+        document.querySelector('.draggable-flag').classList.remove('dragging');
+        toggleFlag(x, y, false, false);
     }
 }
 
@@ -936,4 +819,59 @@ document.querySelectorAll('.difficulty-options input[type="radio"]').forEach(rad
     });
 });
 
+// Move try-again handler to separate function
+function handleTryAgain() {
+    const messageContainer = document.getElementById("message-container");
+    messageContainer.classList.remove('visible');
+    
+    // Sail away animation
+    const gameContainer = document.querySelector('.game-container');
+    gameContainer.classList.remove('ready');
+    gameContainer.classList.add('sailing-out');
+
+   // After sailing out, prepare new game
+   setTimeout(() => {
+    // Temporarily disable transitions
+    gameContainer.style.transition = 'none';
+    
+    // Instantly move to right side of screen
+    gameContainer.classList.remove('sailing-out');
+    gameContainer.classList.add('sailing-in');
+    
+    // Force reflow
+    void gameContainer.offsetHeight;
+    
+    // Re-enable transitions
+    gameContainer.style.transition = '';
+
+    // Reset the grid state
+    revealedCells = 0;
+    firstClick = true;
+
+    // Create new game board
+    const flagsRow = document.querySelector('.flags-row');
+    if (flagsRow) {
+        // ...existing flag reset code...
+    }
+
+    // Initialize new game
+    init();
+
+    // Start sail in animation after a tiny delay
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            gameContainer.classList.remove('sailing-in');
+            gameContainer.classList.add('ready');
+        });
+    });
+}, 800);
+
+    // Reset and show flag controls
+    const flagControls = document.querySelector('.flag-controls');
+    // const messageContainer = document.getElementById("message-container");
+    flagControls.style.display = 'flex';
+    messageContainer.style.display = 'none';
+}
+
+// Start the game
 init();
