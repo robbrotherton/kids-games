@@ -146,7 +146,7 @@ function init() {
 }
 
 function placeMinesAvoiding(safeX, safeY) {
-    const MAX_ATTEMPTS = 50;
+    const MAX_ATTEMPTS = 500;
     let attempts = 0;
 
     do {
