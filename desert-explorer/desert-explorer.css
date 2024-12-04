@@ -66,24 +66,25 @@ main {
 
 .blob-container {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 400px;  /* Larger to cover game area */
-    height: 400px;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     z-index: -1;
     pointer-events: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .blob {
     width: 100%;
     height: 100%;
+    overflow: visible;
 }
 
 .blob path {
-    fill: #f9e8c7;  /* Sandy yellow color */
-    /* filter: blur(30px); */
-    /* opacity: 0.4; */
+    fill: #f9e8c7;
 }
 
 .cell {

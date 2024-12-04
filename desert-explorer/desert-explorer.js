@@ -15,53 +15,7 @@ let firstClick = true;
 let revealedCells = 0;
 let settingsVisible = false;
 
-function generateBlobPoints(numPoints = 30, radius = 100) {  // increased points
-    const points = [];
-    const baseJitter = 0.5;  // base randomness
-    const waveFreq = 100;      // how many small waves to add
-    const waveAmp = 0.01;    // how pronounced the waves are
 
-    for (let i = 0; i < numPoints; i++) {
-        const angle = (i / numPoints) * Math.PI * 2;
-        // Add multiple layers of randomness
-        const mainJitter = (Math.random() - 0.5) * baseJitter;
-        const wave = Math.sin(angle * waveFreq) * waveAmp;
-        const r = radius * (1 + mainJitter + wave);
-
-        // Add slight x/y variation for more natural look
-        const xOffset = (Math.random() - 0.5) * 10;
-        const yOffset = (Math.random() - 0.5) * 10;
-
-        points.push({
-            x: Math.cos(angle) * r + radius * 1.2 + xOffset,
-            y: Math.sin(angle) * r + radius * 1.2 + yOffset
-        });
-    }
-    return points;
-}
-
-function createBlobPath(points) {
-    const smooth = 0.3;  // reduced for smoother transitions
-    let path = `M ${points[0].x},${points[0].y}`;
-
-    // Create smoother curves by using more control points
-    for (let i = 0; i < points.length; i++) {
-        const p0 = points[(i - 1 + points.length) % points.length];
-        const p1 = points[i];
-        const p2 = points[(i + 1) % points.length];
-        const p3 = points[(i + 2) % points.length];
-
-        // Use four points to calculate control points
-        const cp1x = p1.x + (p2.x - p0.x) * smooth;
-        const cp1y = p1.y + (p2.y - p0.y) * smooth;
-        const cp2x = p2.x - (p3.x - p1.x) * smooth;
-        const cp2y = p2.y - (p3.y - p1.y) * smooth;
-
-        path += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${p2.x},${p2.y}`;
-    }
-
-    return path + 'Z';
-}
 
 function init() {
     // Calculate cell size based on difficulty
@@ -130,15 +84,17 @@ function init() {
 
         blobContainer = document.createElement('div');
         blobContainer.className = 'blob-container';
-        gameContainer.appendChild(blobContainer);
+        gameContainer.parentElement.appendChild(blobContainer);
     }
 
-    // Generate new blob with adjusted size
-    const blobPoints = generateBlobPoints(8, 120);
+    // Simplified blob generation
+    const { points: blobPoints, width: blobWidth, height: blobHeight } = generateBlobPoints(width, height);
     const blobPath = createBlobPath(blobPoints);
 
     blobContainer.innerHTML = `
-        <svg viewBox="0 0 300 300" class="blob" preserveAspectRatio="xMidYMid meet">
+        <svg viewBox="0 0 ${blobWidth} ${blobHeight}" 
+             class="blob" 
+             preserveAspectRatio="xMidYMid meet">
             <path d="${blobPath}" />
         </svg>
     `;
