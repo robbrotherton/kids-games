@@ -252,9 +252,9 @@ main {
 }
 
 .cell.drag-over {
-    border: 2px solid #ffd700;
-    transform: scale(1.1);
+    border: 2px solid #ff0000;
 }
+
 
 /*
 @media (max-width: 600px) {
@@ -301,7 +301,7 @@ main {
 #message-container {
     display: none;
     text-align: center;
-    font-size: 3em;
+    font-size: 2.5em;
 }
 
 #message-container.visible {
