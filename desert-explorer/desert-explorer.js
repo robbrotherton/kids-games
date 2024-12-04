@@ -1,7 +1,7 @@
 const DIFFICULTY_SETTINGS = {
     easy: { width: 5, height: 4, numMines: 4 },
-    medium: { width: 6, height: 5, numMines: 7 },
-    hard: { width: 8, height: 6, numMines: 12 }
+    medium: { width: 6, height: 6, numMines: 7 },
+    hard: { width: 8, height: 8, numMines: 12 }
 };
 
 let currentDifficulty = 'easy';
@@ -422,6 +422,7 @@ function checkWin() {
         confetti({
             particleCount: 200,
             spread: 70,
+            startVelocity: 55,
             origin: { y: 0.9 }
         });
     }
