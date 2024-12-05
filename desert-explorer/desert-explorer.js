@@ -419,12 +419,17 @@ function checkWin() {
                 }, index * 100);
             });
 
-        confetti({
-            particleCount: 200,
-            spread: 70,
-            startVelocity: 55,
-            origin: { y: 0.9 }
-        });
+            confetti({
+                particleCount: 200,
+                spread: 70,
+                startVelocity: 80,
+                origin: { y: 0.9 },
+                shapes: ['circle'],
+                colors: ['#ffd700', '#c0c0c0'],
+                scalar: 2,
+                gravity: 3,
+                ticks: 400,
+            });
     }
 }
 
