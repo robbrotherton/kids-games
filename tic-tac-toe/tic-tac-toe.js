@@ -5,12 +5,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let board = Array(9).fill(null);
     let currentPlayer = 'X';
 
-    // Replace radio button logic with button logic
+    // Set initial active state
+    document.querySelector('.mode-button[data-mode="random"]').classList.add('active');
+
     modeButtons.forEach(button => {
-        if (button.dataset.mode === gameMode) {
-            button.classList.add('active');
-        }
-        
         button.addEventListener('click', (event) => {
             modeButtons.forEach(b => b.classList.remove('active'));
             button.classList.add('active');
@@ -25,6 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
         board = Array(9).fill(null);
         currentPlayer = 'X';
         renderBoard();
+        document.getElementById('game-status').textContent = '';
+        document.getElementById('game-status').className = '';
     }
 
     function renderBoard() {
@@ -202,6 +202,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function announceWinner(winner) {
         console.log('Announcing winner:', winner);
+        const statusEl = document.getElementById('game-status');
+        statusEl.textContent = `${winner} wins!`;
+        statusEl.className = winner.toLowerCase();
         confetti({
             shapes: [winner === 'X' ? confettiX : confettiO],
             scalar,
@@ -216,6 +219,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function announceDraw() {
         console.log('Announcing draw');
+        const statusEl = document.getElementById('game-status');
+        statusEl.textContent = 'Draw!';
+        statusEl.className = '';
         confetti({
             shapes: [confettiX, confettiO],
             scalar,

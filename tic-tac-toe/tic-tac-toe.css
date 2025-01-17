@@ -1,3 +1,7 @@
+:root {
+    --grid-color: #666666;
+}
+
 body {
     background-color: var(--tictactoe-bg-color);
     font-family: "Varela Round";
@@ -25,9 +29,11 @@ body {
 
 .game-container {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     min-height: 60vh;
+    gap: 20px;
 }
 
 #game {
@@ -54,16 +60,16 @@ body {
 
 /* Add borders only to create the grid lines */
 .cell:nth-child(1), .cell:nth-child(2), .cell:nth-child(4), .cell:nth-child(5) {
-    border-right: 2px solid #333;
-    border-bottom: 2px solid #333;
+    border-right: 2px solid var(--grid-color);
+    border-bottom: 2px solid var(--grid-color);
 }
 
 .cell:nth-child(3), .cell:nth-child(6) {
-    border-bottom: 2px solid #333;
+    border-bottom: 2px solid var(--grid-color);
 }
 
 .cell:nth-child(7), .cell:nth-child(8) {
-    border-right: 2px solid #333;
+    border-right: 2px solid var(--grid-color);
 }
 
 .cell.winner {
@@ -111,4 +117,18 @@ body {
 
 .mode-button.active {
     background: var(--tictactoe-fg-color);
+}
+
+#game-status {
+    font-size: 1.5em;
+    font-weight: bold;
+    min-height: 1.5em;  /* Preserve space to prevent layout shift */
+}
+
+#game-status.x {
+    color: #e74c3c;  /* red - match X color */
+}
+
+#game-status.o {
+    color: #3498db;  /* blue - match O color */
 }
