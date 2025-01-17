@@ -1,10 +1,6 @@
-:root {
-    --grid-color: #666666;
-}
-
 body {
     background-color: var(--tictactoe-bg-color);
-    font-family: "Varela Round";
+    font-family: var(--tictactoe-font);
 }
 
 #header {
@@ -60,16 +56,16 @@ body {
 
 /* Add borders only to create the grid lines */
 .cell:nth-child(1), .cell:nth-child(2), .cell:nth-child(4), .cell:nth-child(5) {
-    border-right: 2px solid var(--grid-color);
-    border-bottom: 2px solid var(--grid-color);
+    border-right: 2px solid var(--tictactoe-grid-color);
+    border-bottom: 2px solid var(--tictactoe-grid-color);
 }
 
 .cell:nth-child(3), .cell:nth-child(6) {
-    border-bottom: 2px solid var(--grid-color);
+    border-bottom: 2px solid var(--tictactoe-grid-color);
 }
 
 .cell:nth-child(7), .cell:nth-child(8) {
-    border-right: 2px solid var(--grid-color);
+    border-right: 2px solid var(--tictactoe-grid-color);
 }
 
 .cell.winner {
@@ -117,6 +113,7 @@ body {
 
 .mode-button.active {
     background: var(--tictactoe-fg-color);
+    color: var(--tictactoe-accent-color);
 }
 
 #game-status {
