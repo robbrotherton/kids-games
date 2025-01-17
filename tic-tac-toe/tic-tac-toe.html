@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="tic-tac-toe.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <title>Tic Tac Toe</title>
+
+</head>
+
+<body>
+  <div id="header">
+    <button id="back-button" type="button" title="Go back" onclick="window.location.href='../index.html'"><img
+      src="../assets/back-arrow.png" alt="Back"></button>
+    <h1 id="game-title">Tic Tac Toe</h1>
+    <button id="settings-button"><img src="../assets/settings-gear.png"
+        alt="Settings"></button>
+  </div>
+
+  <div id="settings-overlay" class="settings-overlay">
+    <div class="settings-content">
+      <h2>Settings</h2>
+      <div class="settings-section">
+        <h3>Game Mode</h3>
+        <div class="game-mode-options">
+          <label>
+            <input type="radio" name="game-mode" value="random" checked>
+            <span>Play against Random Computer</span>
+          </label>
+          <label>
+            <input type="radio" name="game-mode" value="perfect">
+            <span>Play against Perfect Computer</span>
+          </label>
+          <label>
+            <input type="radio" name="game-mode" value="local">
+            <span>Play against Local Opponent</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <div class="game-container">
+        <div id="game"></div>
+    </div>
+  </main>
+
+  <div id="bottom-bar">
+    <button id="try-again-button"><img src="../assets/refresh-button.png" alt="refresh"></button>
+  </div>
+
+  <script type="module" src="tic-tac-toe.js"></script>
+</body>
+
+</html>

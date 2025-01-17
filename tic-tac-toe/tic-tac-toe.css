@@ -1,0 +1,82 @@
+body {
+    background-color: var(--tictactoe-bg-color);
+    font-family: "Varela Round";
+}
+
+#header {
+    background-color: rgb(243, 243, 243);
+    color: var(--tictactoe-accent-color);
+    font-family: "Varela Round";
+}
+
+.settings-section {
+    margin-bottom: 20px;
+}
+
+.game-mode-options label {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.game-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+}
+
+#game {
+    display: grid;
+    grid-template-columns: repeat(3, 100px);
+    grid-template-rows: repeat(3, 100px);
+    gap: 0;
+    width: 300px;
+    height: 300px;
+    background: none;
+    padding: 0;
+}
+
+.cell {
+    background-color: transparent;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3em;
+    cursor: pointer;
+    position: relative;
+}
+
+/* Add borders only to create the grid lines */
+.cell:nth-child(1), .cell:nth-child(2), .cell:nth-child(4), .cell:nth-child(5) {
+    border-right: 2px solid #333;
+    border-bottom: 2px solid #333;
+}
+
+.cell:nth-child(3), .cell:nth-child(6) {
+    border-bottom: 2px solid #333;
+}
+
+.cell:nth-child(7), .cell:nth-child(8) {
+    border-right: 2px solid #333;
+}
+
+.cell:hover {
+    background-color: rgba(240, 240, 240, 0.3);
+}
+
+.cell.winner {
+    background-color: rgba(76, 175, 80, 0.3);
+}
+
+.cell.draw {
+    background-color: rgba(158, 158, 158, 0.3);
+}
+
+.cell.x {
+    color: #e74c3c;  /* red */
+}
+
+.cell.o {
+    color: #3498db;  /* blue */
+}

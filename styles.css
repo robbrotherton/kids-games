@@ -65,6 +65,11 @@ body {
   --mastermind-bg-color: rgb(77, 77, 77);
   --mastermind-fg-color: rgb(243, 243, 243);
   --mastermind-accent-color: #4e8d50;
+
+  --tictactoe-bg-color: rgb(255, 255, 255);
+  --tictactoe-fg-color: rgb(230, 168, 168);
+  --tictactoe-accent-color: #4e8d50;
+  --tictactoe-font: "Varela Round", serif;
 }
 
 
@@ -96,5 +101,11 @@ body {
 .baumans-bold {
   font-family: "Baumans", system-ui;
   font-weight: 900;
+  font-style: normal;
+}
+
+.varela-round-regular {
+  font-family: "Varela Round", serif;
+  font-weight: 400;
   font-style: normal;
 }
