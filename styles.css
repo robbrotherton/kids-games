@@ -1,7 +1,7 @@
 :root {
   --vh: 1vh;
-  --header-height: calc(var(--vh, 1vh) * 7);
-  --bottom-bar-height: calc(var(--vh, 1vh) * 7);
+  --header-height: 7%;
+  --bottom-bar-height: 7%;
 
   --mastermind-bg-color: rgb(77, 77, 77);
   --mastermind-fg-color: rgb(243, 243, 243);
@@ -14,17 +14,19 @@
   --tictactoe-font: "Varela Round", serif;
 }
 
-
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+html, body {
+  height: 100%;
+}
+
 body {
-  min-height: 100vh;
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: var(--header-height) 1fr var(--bottom-bar-height);
   overflow: hidden;
 }
 
@@ -76,10 +78,6 @@ body {
   background: none;
   border: none;
 }
-
-
-
-
 
 /************ fonts  *************/
 .rye-regular {
