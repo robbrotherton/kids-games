@@ -67,8 +67,8 @@ body {
   --mastermind-accent-color: #4e8d50;
 
   --tictactoe-bg-color: rgb(255, 255, 255);
-  --tictactoe-fg-color: rgb(230, 168, 168);
-  --tictactoe-accent-color: #4e8d50;
+  --tictactoe-fg-color: #3498db;
+  --tictactoe-accent-color: #e74c3c;
   --tictactoe-font: "Varela Round", serif;
 }
 

@@ -1,15 +1,20 @@
-// ...existing code...
-
 document.addEventListener('DOMContentLoaded', () => {
     const gameContainer = document.getElementById('game');
-    const gameModeRadios = document.querySelectorAll('input[name="game-mode"]');
+    const modeButtons = document.querySelectorAll('.mode-button');
     let gameMode = 'random';
     let board = Array(9).fill(null);
     let currentPlayer = 'X';
 
-    gameModeRadios.forEach(radio => {
-        radio.addEventListener('change', (event) => {
-            gameMode = event.target.value;
+    // Replace radio button logic with button logic
+    modeButtons.forEach(button => {
+        if (button.dataset.mode === gameMode) {
+            button.classList.add('active');
+        }
+        
+        button.addEventListener('click', (event) => {
+            modeButtons.forEach(b => b.classList.remove('active'));
+            button.classList.add('active');
+            gameMode = button.dataset.mode;
             startNewGame();
         });
     });
