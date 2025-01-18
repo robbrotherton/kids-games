@@ -1,6 +1,7 @@
 :root {
   --vh: 1vh;
   --header-height: 7dvh;
+  --main-height: 86dvh;
   --bottom-bar-height: 7dvh;
 
   --mastermind-bg-color: rgb(77, 77, 77);
@@ -22,7 +23,7 @@
 
 body {
   display: grid;
-  grid-template-rows: var(--header-height) auto var(--bottom-bar-height);
+  grid-template-rows: var(--header-height) var(--main-height) var(--bottom-bar-height);
   overflow: hidden;
 }
 
