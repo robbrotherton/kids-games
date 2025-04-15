@@ -208,12 +208,12 @@ main {
 }
 
 .cell.safe .cell-front {
-    background-color: #d4f8d4;
+    /* background-color: #d4f8d4; */
 }
 
 
 .cell.mine-hint .cell-front {
-    background-color: #ffb7b7;
+    /* background-color: #ffb7b7; */
 }
 
 .flag-container {
