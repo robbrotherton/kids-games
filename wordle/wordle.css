@@ -1,0 +1,172 @@
+/* wordle.css: Basic styles for Wordle game */
+
+.wordle-board {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  margin: 30px auto 20px auto;
+}
+
+.wordle-row {
+  display: flex;
+  gap: 8px;
+}
+
+.wordle-cell {
+  width: 48px;
+  height: 48px;
+  border: 2px solid #888;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 2em;
+  font-family: 'Baumans', sans-serif;
+  color: #222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  text-transform: uppercase;
+  transition: background 0.2s, border 0.2s;
+}
+
+.wordle-keyboard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.keyboard-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.guess-btn {
+  margin-bottom: 12px;
+  padding: 10px 32px;
+  font-size: 1.2em;
+  font-family: 'Baumans', sans-serif;
+  background-color: #6aaa64;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  letter-spacing: 2px;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.guess-btn:hover {
+  background-color: #538d4e;
+  transform: scale(1.05);
+}
+
+.keyboard-row {
+  display: flex;
+  gap: 6px;
+}
+
+.key-btn {
+  min-width: 36px;
+  height: 44px;
+  border: none;
+  border-radius: 4px;
+  background: #eee;
+  font-size: 1.1em;
+  font-family: 'Baumans', sans-serif;
+  color: #333;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.key-btn.special {
+  min-width: 60px;
+  background: #d0d0d0;
+  font-weight: bold;
+}
+
+.key-btn:active {
+  background: #ccc;
+}
+
+/* Feedback colors for correct/partial/wrong letters (to be used in JS) */
+.wordle-cell.correct {
+  background: #6aaa64;
+  color: #fff;
+  border-color: #6aaa64;
+}
+.wordle-cell.present {
+  background: #c9b458;
+  color: #fff;
+  border-color: #c9b458;
+}
+.wordle-cell.absent {
+  background: #787c7e;
+  color: #fff;
+  border-color: #787c7e;
+}
+
+#bottom-bar {
+  background-color: none; /* Soft yellow for Wordle bottom bar */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  min-height: 56px;
+  font-size: 1.2em;
+  font-family: 'Baumans', sans-serif;
+  position: relative;
+}
+
+#bottom-bar-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 20px;
+}
+
+.hint-btn {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: darkgrey;
+  border: 1px solid black;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1em;
+  color: #ffffff;
+  transition: color 0.2s;
+  padding: 4px 8px;
+  z-index: 2;
+}
+.hint-btn:hover {
+  color: #333;
+}
+
+.replay-button {
+  font-size: 1em;
+  color: #fff;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.replay-button:hover {
+  background-color: #538d4e;
+  transform: scale(1.05);
+}
+
+.replay-button img {
+  height: 1.5em;
+  margin-left: 4px;
+  vertical-align: middle;
+}

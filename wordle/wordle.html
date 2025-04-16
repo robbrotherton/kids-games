@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="wordle.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Baumans&family=Just+Another+Hand&family=Trade+Winds&display=swap"
+    rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <title>Wordle</title>
+
+</head>
+
+<body>
+  <div id="header">
+    <button id="back-button" type="button" title="Go back" onclick="window.location.href='../index.html'"><img
+        src="../assets/back-arrow.png" alt="Back"></button>
+    <h1 id="game-title"><span class="baumans-regular">WORDLE</span></h1>
+    <button id="settings-button"><img src="../assets/settings-gear.png"
+        alt="Settings"></button>
+  </div>
+  <div id="game" class="game">
+
+  </div>
+  <div id="bottom-bar">
+    
+  </div>
+
+  <script src="word-lists.js"></script>
+  <script src="wordle.js"></script>
+</body>
+
+</html>
