@@ -143,8 +143,8 @@ function resetGame() {
     gameBoard.innerHTML = '';
     colorControls.innerHTML = '';
     
-    // Reset the footer
-    document.getElementById("footer").innerHTML = `
+    // Reset the footer - Use bottom-bar ID instead of footer
+    document.getElementById("bottom-bar").innerHTML = `
         <button id="checkButton" class="check-button baumans-regular">CHECK GUESS</button>
     `;
     
@@ -183,9 +183,20 @@ function handleCheckButton() {
             return;
         }
         if (++currentRow >= maxAttempts) {
-            winMessage.textContent = `Game over! The code was: ${secretCode.join(", ")}`;
+            const footer = document.getElementById("bottom-bar");
+            footer.innerHTML = `
+                <div class="game-over-container">
+                    <div class="game-over-message baumans-regular">GAME OVER! THE CODE WAS: ${secretCode.map(color => 
+                        `<span class="code-reveal" style="background-color: ${color}"></span>`
+                    ).join("")} <button id="try-again-button"><img src="../assets/refresh-button.png"></button></div>
+                </div>
+            `;
+            
+            // Add click handler to try-again button
+            document.getElementById("try-again-button").addEventListener("click", resetGame);
             return;
         }
+        
         // Move indicator and reset button state
         const indicator = document.querySelector(".row-indicator");
         const rowHeight = 60; // height of a row (50px) + gap (10px)
