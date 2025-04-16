@@ -36,6 +36,8 @@ function initBoard() {
             slot.classList.add("slot");
             slot.dataset.row = i;
             slot.dataset.col = j;
+            // Add click event listener to allow removing a color
+            slot.addEventListener("click", handleSlotClick);
             guessContainer.appendChild(slot);
         }
         
@@ -51,8 +53,6 @@ function initBoard() {
         rowContainer.appendChild(guessContainer);
         rowContainer.appendChild(pegsContainer);
         gameBoard.appendChild(rowContainer);
-
-        // Remove the indicator creation from here (it was in the i === 0 condition)
     }
 }
 
@@ -67,6 +67,53 @@ function initColorControls() {
     });
 }
 
+
+function handleSlotClick(event) {
+    const slot = event.target;
+    const row = parseInt(slot.dataset.row);
+    const col = parseInt(slot.dataset.col);
+    
+    // Only allow clicking slots in the current row that have been filled
+    if (row === currentRow && slot.classList.contains("filled")) {
+        // Find the color position in the currentGuess array
+        // Since the slots are filled in order, the column number corresponds to the position
+        
+        // Remove the color from the currentGuess array
+        currentGuess.splice(col, 1);
+        
+        // Clear the clicked slot
+        slot.style.backgroundColor = "";
+        slot.classList.remove("filled");
+        
+        // Need to reset all slots after this one
+        const currentRowSlots = gameBoard.querySelectorAll(`.slot[data-row="${currentRow}"]`);
+        
+        // Clear all slots from this position to the end of the row
+        for (let i = col + 1; i < codeLength; i++) {
+            if (currentRowSlots[i].classList.contains("filled")) {
+                currentRowSlots[i].style.backgroundColor = "";
+                currentRowSlots[i].classList.remove("filled");
+            }
+        }
+        
+        // Rebuild the currentGuess array with remaining colors
+        const filledSlots = gameBoard.querySelectorAll(`.slot[data-row="${currentRow}"].filled`);
+        currentGuess = Array.from(filledSlots).map(s => {
+            // Extract the color from the backgroundColor style
+            const bgColor = s.style.backgroundColor;
+            // Convert to a simple color name if needed
+            return bgColor.replace("rgb(255, 0, 0)", "red")
+                         .replace("rgb(0, 0, 255)", "blue")
+                         .replace("rgb(255, 255, 0)", "yellow")
+                         .replace("rgb(0, 128, 0)", "green");
+        });
+        
+        // Update the button state
+        const checkButton = document.getElementById("checkButton");
+        checkButton.classList.remove("active");
+    }
+}
+
 function handleColorClick(colorBtn) {
     if (currentGuess.length < codeLength) {
         const nextSlot = gameBoard.querySelector(
@@ -77,7 +124,7 @@ function handleColorClick(colorBtn) {
             nextSlot.classList.add("filled");
             currentGuess.push(colorBtn.dataset.color);
             
-            // Add this: Toggle active class when guess is complete
+            // Toggle active class when guess is complete
             const checkButton = document.getElementById("checkButton");
             if (currentGuess.length === codeLength) {
                 checkButton.classList.add("active");
@@ -196,7 +243,7 @@ function handleCheckButton() {
             document.getElementById("try-again-button").addEventListener("click", resetGame);
             return;
         }
-        
+
         // Move indicator and reset button state
         const indicator = document.querySelector(".row-indicator");
         const rowHeight = 60; // height of a row (50px) + gap (10px)
