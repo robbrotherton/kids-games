@@ -4,15 +4,19 @@ const feedback = document.getElementById("feedback");
 const winMessage = document.getElementById("winMessage");
 // const colors = ["red", "blue", "yellow", "green", "purple", "orange"]; // now expandable
 const colors = ["red", "blue", "yellow", "green"]; // now expandable
-const codeLength = 4;
+let codeLength = 4;
 const maxAttempts = 10;
 let currentGuess = [];
 let currentRow = 0;
+let settingsPanelOpen = false;
+const availableColors = ["red", "blue", "yellow", "green", "purple", "orange"];
+
 
 // generate the secret code
 const secretCode = Array.from({ length: codeLength }, () => 
   colors[Math.floor(Math.random() * colors.length)]
 );
+console.log("Secret Code:", secretCode); // For debugging purposes
 
 // create the game board
 function initBoard() {
@@ -180,17 +184,18 @@ function resetGame() {
     currentGuess = [];
     currentRow = 0;
     
-    // Generate new secret code
+    // Generate new secret code using current settings
     secretCode.length = 0;
     secretCode.push(...Array.from({ length: codeLength }, () => 
         colors[Math.floor(Math.random() * colors.length)]
     ));
+    console.log("New Secret Code:", secretCode); // For debugging purposes
     
     // Clear the board
     gameBoard.innerHTML = '';
     colorControls.innerHTML = '';
     
-    // Reset the footer - Use bottom-bar ID instead of footer
+    // Reset the footer
     document.getElementById("bottom-bar").innerHTML = `
         <button id="checkButton" class="check-button baumans-regular">CHECK GUESS</button>
     `;
@@ -254,6 +259,98 @@ function handleCheckButton() {
         feedback.textContent = "Please fill all slots before checking!";
     }
 }
+
+function toggleSettingsPanel() {
+    if (settingsPanelOpen) {
+        // Close the panel if it's open
+        const existingPanel = document.getElementById("settings-panel");
+        if (existingPanel) {
+            existingPanel.remove();
+        }
+        settingsPanelOpen = false;
+    } else {
+        // Create settings panel
+        const settingsPanel = document.createElement("div");
+        settingsPanel.id = "settings-panel";
+        settingsPanel.className = "settings-panel";
+        
+        // Create panel contents
+        settingsPanel.innerHTML = `
+            <div class="settings-header">
+                <h3 class="baumans-regular">Settings</h3>
+                <button id="close-settings" class="close-button">×</button>
+            </div>
+            <div class="settings-content">
+                <div class="setting-group">
+                    <label class="setting-label baumans-regular">Number of Colors:</label>
+                    <div class="setting-control">
+                        <input type="range" id="color-count" min="2" max="6" value="${colors.length}" />
+                        <span id="color-count-value" class="setting-value baumans-regular">${colors.length}</span>
+                    </div>
+                </div>
+                <div class="setting-group">
+                    <label class="setting-label baumans-regular">Code Length:</label>
+                    <div class="setting-control">
+                        <input type="range" id="code-length" min="3" max="4" value="${codeLength}" />
+                        <span id="code-length-value" class="setting-value baumans-regular">${codeLength}</span>
+                    </div>
+                </div>
+                <button id="apply-settings" class="apply-button baumans-regular">Apply & Restart</button>
+            </div>
+        `;
+        
+        document.body.appendChild(settingsPanel);
+        
+        // Add event listeners for settings controls
+        document.getElementById("color-count").addEventListener("input", (e) => {
+            document.getElementById("color-count-value").textContent = e.target.value;
+        });
+        
+        document.getElementById("code-length").addEventListener("input", (e) => {
+            document.getElementById("code-length-value").textContent = e.target.value;
+        });
+        
+        // Close button functionality
+        document.getElementById("close-settings").addEventListener("click", toggleSettingsPanel);
+        
+        // Apply button functionality
+        document.getElementById("apply-settings").addEventListener("click", applySettings);
+        
+        settingsPanelOpen = true;
+    }
+}
+
+function applySettings() {
+    const newColorCount = parseInt(document.getElementById("color-count").value);
+    const newCodeLength = parseInt(document.getElementById("code-length").value);
+    
+    // Update game settings
+    colors.length = 0; // Clear the array
+    colors.push(...availableColors.slice(0, newColorCount)); // Add selected number of colors
+    
+    // Update code length - use the actual variable, not a window property
+    codeLength = newCodeLength;
+    
+    // Close settings panel
+    toggleSettingsPanel();
+    
+    // Reset and restart the game
+    resetGame();
+}
+
+// Add event listener to the settings button in your HTML
+document.addEventListener("DOMContentLoaded", function() {
+    // Set up settings button
+    const settingsButton = document.getElementById("settings-button");
+    if (settingsButton) {
+        settingsButton.addEventListener("click", toggleSettingsPanel);
+    } else {
+        console.error("Settings button not found");
+    }
+    
+    // Set up check button
+    document.getElementById("checkButton").addEventListener("click", handleCheckButton);
+});
 
 // Replace the anonymous check button listener with named function
 document.getElementById("checkButton").addEventListener("click", handleCheckButton);
