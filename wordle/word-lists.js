@@ -206,7 +206,6 @@ window.fiveLetterWords = [
   { word: "block", category: "object" },
   { word: "brush", category: "object" },
   { word: "candy", category: "food" },
-  { word: "cheese", category: "food" },
   { word: "clown", category: "person" },
   { word: "dance", category: "activity" },
   { word: "eagle", category: "animal" },

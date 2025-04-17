@@ -116,7 +116,48 @@ function renderBottomBar(contentHtml = '', showHint = true) {
   }
 }
 
-function showMessage(msg, showPlayAgain = false) {
+function showMessage(msg, showPlayAgain = false, win = false) {
+  // If win/lose, show endgame modal instead of bottom bar
+  if (showPlayAgain) {
+    // Extract etymology and headscratcher from secretWordDictEntries
+    let etymology = null, headscratcher = null;
+    if (secretWordDictEntries && secretWordDictEntries.length > 0) {
+      // Etymology: join all et fields from all entries
+      const etyms = [];
+      secretWordDictEntries.forEach(e => {
+        if (e.et && Array.isArray(e.et)) {
+          e.et.forEach(etItem => {
+            if (Array.isArray(etItem) && typeof etItem[1] === 'string') {
+              etyms.push(etItem[1].replace(/{.*?}/g, ''));
+            } else if (Array.isArray(etItem) && Array.isArray(etItem[1])) {
+              etyms.push(etItem[1].map(s => typeof s === 'string' ? s.replace(/{.*?}/g, '') : '').join(' '));
+            }
+          });
+        }
+      });
+      etymology = etyms.length > 0 ? etyms.join(' ') : null;
+      // Headscratcher: look for art field with artid 'heads' or similar
+      let heads = null;
+      secretWordDictEntries.forEach(e => {
+        if (e.art && Array.isArray(e.art)) {
+          e.art.forEach(artItem => {
+            if (artItem.artid && (artItem.artid.toLowerCase().includes('head') || artItem.artid.toLowerCase().includes('scratcher'))) {
+              heads = artItem.caption || artItem.text || null;
+            }
+          });
+        }
+      });
+      headscratcher = heads;
+    }
+    window.showEndgameModal({
+      word: secretWord.word,
+      win,
+      etymology,
+      headscratcher,
+      onPlayAgain: startGame
+    });
+    return;
+  }
   let html = `<span>${msg}</span>`;
   if (showPlayAgain) {
     html += ` <button id="play-again-btn" class="replay-button" title="Play Again"><img src="../assets/refresh-button.png" alt="Play Again"></button>`;
@@ -188,7 +229,7 @@ function handleKeyPress(key) {
     const feedback = getFeedback(currentGuess, secretWord.word);
     colorRow(currentGuess, feedback);
     if (currentGuess === secretWord.word) {
-      showMessage('You win!', true);
+      showMessage('You win!', true, true);
       if (window.confetti) {
         window.confetti({
           particleCount: 120,
@@ -199,7 +240,7 @@ function handleKeyPress(key) {
       return;
     }
     if (guesses.length >= maxGuesses) {
-      showMessage('Game over! The word was: ' + secretWord.word.toUpperCase(), true);
+      showMessage('Game over! The word was: ' + secretWord.word.toUpperCase(), true, false);
       return;
     }
     currentGuess = '';
