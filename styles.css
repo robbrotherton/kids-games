@@ -14,7 +14,7 @@
   --tictactoe-grid-color: grey;
   --tictactoe-font: "Varela Round", serif;
 
-  --wordle-font: "Roboto Mono", monospace;
+  --wordle-font: Arial;
 }
 
 * {
