@@ -9,6 +9,7 @@ let maxGuesses = DEFAULT_MAX_GUESSES;
 let secretWord = '';
 let guesses = [];
 let currentGuess = '';
+let secretWordDictEntries = null; // Store dictionary API result for the secret word
 
 const gameContainer = document.getElementById('game');
 const bottomBar = document.getElementById('bottom-bar');
@@ -104,11 +105,11 @@ function renderBottomBar(contentHtml = '', showHint = true) {
     hintBtn.id = 'hint-btn';
     hintBtn.className = 'hint-btn';
     hintBtn.title = 'Show a hint';
-    hintBtn.innerHTML = 'hint';
+    hintBtn.innerHTML = '❓';
     hintBtn.addEventListener('click', () => {
-      if (secretWord && secretWord.category) {
-        renderBottomBar(`<span style=\"font-size:1.2em;\">💡 Hint: <b>${secretWord.category}</b></span>`, true);
-        setTimeout(() => renderBottomBar('', true), 2000);
+      if (secretWordDictEntries) {
+        const hints = window.getAllHints(secretWordDictEntries, secretWord.word);
+        window.showHintPane(hints);
       }
     });
     bottomBar.appendChild(hintBtn);
@@ -236,6 +237,13 @@ function createHintButton() {
   return hintBtn;
 }
 
+
+// Attach to settings button in header
+const settingsBtn = document.getElementById('settings-button');
+if (settingsBtn) {
+  settingsBtn.onclick = showSettingsModal;
+}
+
 function setupUI() {
   createBoard();
   createKeyboard();
@@ -248,8 +256,31 @@ function startGame() {
   secretWord = pickSecretWord();
   guesses = [];
   currentGuess = '';
+  secretWordDictEntries = null;
   renderBottomBar();
   setupUI();
+
+  // Fetch definition for the secret word and store the result for hints
+  fetch('https://word-game-backend.netlify.app/.netlify/functions/define?word=' + encodeURIComponent(secretWord.word))
+    .then(res => res.json())
+    .then(data => {
+      // Filter to only entries where meta.id is the word or starts with the word + ' '
+      const word = secretWord.word.toLowerCase();
+      const filtered = data.filter(entry => {
+        if (entry.meta && entry.meta.id) {
+          const idBase = entry.meta.id.split(':')[0].toLowerCase();
+          return idBase === word || idBase.startsWith(word + ' ');
+        }
+        return false;
+      });
+      secretWordDictEntries = filtered;
+      // For testing: log the part-of-speech hint
+      const posHint = window.getPartOfSpeechHint(filtered);
+      if (posHint) {
+        console.log('Hint:', posHint);
+      }
+    })
+    .catch(err => console.error('Error fetching definition:', err));
 }
 
 document.addEventListener('DOMContentLoaded', startGame);
