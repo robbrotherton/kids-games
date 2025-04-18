@@ -17,12 +17,12 @@ function showSettingsModal() {
     modal.innerHTML = `
       <div class="settings-panel">
         <div class="settings-header">
-          <h3 class="baumans-regular">Settings</h3>
+          <h3>Settings</h3>
           <button id="close-settings" class="close-button">×</button>
         </div>
         <div class="settings-content">
           <div class="setting-group">
-            <label class="setting-label baumans-regular">Word Length:</label>
+            <label class="setting-label">Word Length:</label>
             <div class="setting-control">
               <label><input type="radio" name="word-length" value="3" ${wordLength===3?'checked':''}/> 3</label>
               <label style="margin-left:10px;"><input type="radio" name="word-length" value="4" ${wordLength===4?'checked':''}/> 4</label>
@@ -31,12 +31,12 @@ function showSettingsModal() {
             </div>
           </div>
           <div class="setting-group">
-            <label class="setting-label baumans-regular">Number of Guesses:</label>
+            <label class="setting-label">Number of Guesses:</label>
             <div class="setting-control">
               <input type="number" id="num-guesses" min="4" max="8" value="${maxGuesses}" style="width:60px;"> (4–8)
             </div>
           </div>
-          <button id="apply-settings" class="apply-button baumans-regular">Apply & Restart</button>
+          <button id="apply-settings" class="apply-button">Apply & Restart</button>
         </div>
       </div>
     `;
