@@ -27,6 +27,7 @@ function showSettingsModal() {
               <label><input type="radio" name="word-length" value="3" ${wordLength===3?'checked':''}/> 3</label>
               <label style="margin-left:10px;"><input type="radio" name="word-length" value="4" ${wordLength===4?'checked':''}/> 4</label>
               <label style="margin-left:10px;"><input type="radio" name="word-length" value="5" ${wordLength===5?'checked':''}/> 5</label>
+              <label style="margin-left:10px;"><input type="radio" name="word-length" value="6" ${wordLength===6?'checked':''}/> 6</label>
             </div>
           </div>
           <div class="setting-group">
