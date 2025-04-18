@@ -10,6 +10,9 @@ let secretWord = '';
 let guesses = [];
 let currentGuess = '';
 let secretWordDictEntries = null; // Store dictionary API result for the secret word
+let absentLetters = new Set(); // Track guessed letters that are absent
+let correctLetters = new Set(); // Track guessed letters that are correct (green)
+let presentLetters = new Set(); // Track guessed letters that are present (yellow)
 
 const gameContainer = document.getElementById('game');
 const bottomBar = document.getElementById('bottom-bar');
@@ -240,7 +243,27 @@ function colorRow(guess, feedback) {
     const cell = row.children[i];
     cell.classList.remove('correct', 'present', 'absent');
     cell.classList.add(feedback[i]);
+    // Track letters for keyboard coloring
+    const letter = guess[i].toLowerCase();
+    if (feedback[i] === 'correct') {
+      correctLetters.add(letter);
+      // Remove from present/absent if upgraded to correct
+      presentLetters.delete(letter);
+      absentLetters.delete(letter);
+    } else if (feedback[i] === 'present') {
+      // Only add if not already correct
+      if (!correctLetters.has(letter)) {
+        presentLetters.add(letter);
+        absentLetters.delete(letter);
+      }
+    } else if (feedback[i] === 'absent') {
+      // Only add if not already correct or present
+      if (!correctLetters.has(letter) && !presentLetters.has(letter)) {
+        absentLetters.add(letter);
+      }
+    }
   }
+  updateKeyboardColors();
 }
 
 function getFeedback(guess, answer) {
@@ -319,6 +342,25 @@ function addKeyboardListeners() {
   });
 }
 
+function updateKeyboardColors() {
+  const buttons = document.querySelectorAll('.key-btn');
+  buttons.forEach(btn => {
+    const key = btn.getAttribute('data-key');
+    btn.classList.remove('absent', 'present', 'correct');
+    // Only mark single-letter keys (not Backspace)
+    if (key && key.length === 1) {
+      const letter = key.toLowerCase();
+      if (correctLetters.has(letter)) {
+        btn.classList.add('correct');
+      } else if (presentLetters.has(letter)) {
+        btn.classList.add('present');
+      } else if (absentLetters.has(letter)) {
+        btn.classList.add('absent');
+      }
+    }
+  });
+}
+
 function createHintButton() {
   const hintBtn = document.createElement('button');
   hintBtn.id = 'hint-btn';
@@ -347,6 +389,7 @@ function setupUI() {
   addKeyboardListeners();
   updateBoard();
   renderBottomBar();
+  updateKeyboardColors(); // Ensure keyboard is updated on new game
 }
 
 function singularize(word) {
@@ -367,6 +410,9 @@ function startGame() {
     guesses = [];
     currentGuess = '';
     secretWordDictEntries = null;
+    absentLetters = new Set(); // Reset absent letters on new game
+    correctLetters = new Set(); // Reset correct letters on new game
+    presentLetters = new Set(); // Reset present letters on new game
     renderBottomBar();
     setupUI();
 
