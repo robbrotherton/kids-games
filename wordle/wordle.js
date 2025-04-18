@@ -14,16 +14,40 @@ let secretWordDictEntries = null; // Store dictionary API result for the secret 
 const gameContainer = document.getElementById('game');
 const bottomBar = document.getElementById('bottom-bar');
 
+let wordLists = {};
+let domReady = false;
+let wordsReady = false;
+
+function tryStartGame() {
+  if (domReady && wordsReady) startGame();
+}
+
+// Fetch words.json before starting the game
+fetch('words.json')
+  .then(res => res.json())
+  .then(data => {
+    wordLists = data;
+    wordsReady = true;
+    tryStartGame();
+  });
+
+document.addEventListener('DOMContentLoaded', () => {
+  domReady = true;
+  tryStartGame();
+});
+
+
 function getWordList(length) {
-  if (length === 3) return window.threeLetterWords;
-  if (length === 4) return window.fourLetterWords;
-  if (length === 5) return window.fiveLetterWords;
-  return window.fourLetterWords;
+  const arr = wordLists[length] || [];
+  // Return as array of objects: {word: "text"}
+  return arr.map(w => ({ word: w }));
 }
 
 function pickSecretWord() {
   const list = getWordList(wordLength);
-  return list[Math.floor(Math.random() * list.length)]; // returns {word, category}
+  const word = list[Math.floor(Math.random() * list.length)];
+  console.log(word);
+  return word;
 }
 
 function createBoard() {
@@ -54,9 +78,9 @@ function createGuessButton() {
 
 function createKeyboard() {
   let keys = [
-    ['Q','W','E','R','T','Y','U','I','O','P'],
-    ['A','S','D','F','G','H','J','K','L'],
-    ['Z','X','C','V','B','N','M','Backspace'] // Add Backspace to the end of the last row
+    ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+    ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
+    ['Z', 'X', 'C', 'V', 'B', 'N', 'M', 'Backspace'] // Add Backspace to the end of the last row
   ];
   const keyboardWrapper = document.createElement('div');
   keyboardWrapper.className = 'keyboard-wrapper';
@@ -121,55 +145,87 @@ function showMessage(msg, showPlayAgain = false, win = false) {
   if (showPlayAgain) {
     // Extract etymology and headscratcher from secretWordDictEntries
     let etymology = null, headscratcher = null;
+
+    // ...inside showMessage...
+    let etymologyEntries = [];
     if (secretWordDictEntries && secretWordDictEntries.length > 0) {
-      // Etymology: join all et fields from all entries
-      const etyms = [];
       secretWordDictEntries.forEach(e => {
+        // history (object with pt array)
+        if (e.history && typeof e.history === 'object' && Array.isArray(e.history.pt)) {
+          e.history.pt.forEach(ptItem => {
+            if (Array.isArray(ptItem) && typeof ptItem[1] === 'string') {
+              etymologyEntries.push(ptItem[1].replace(/{.*?}/g, ''));
+            }
+          });
+        }
+        // history (array, legacy support)
+        if (e.history && Array.isArray(e.history)) {
+          e.history.forEach(h => {
+            if (typeof h === 'string') etymologyEntries.push(h.replace(/{.*?}/g, ''));
+            else if (Array.isArray(h)) etymologyEntries.push(h.map(s => typeof s === 'string' ? s.replace(/{.*?}/g, '') : '').join(' '));
+          });
+        }
+        // et
         if (e.et && Array.isArray(e.et)) {
           e.et.forEach(etItem => {
             if (Array.isArray(etItem) && typeof etItem[1] === 'string') {
-              etyms.push(etItem[1].replace(/{.*?}/g, ''));
+              etymologyEntries.push(etItem[1].replace(/{.*?}/g, ''));
             } else if (Array.isArray(etItem) && Array.isArray(etItem[1])) {
-              etyms.push(etItem[1].map(s => typeof s === 'string' ? s.replace(/{.*?}/g, '') : '').join(' '));
+              etymologyEntries.push(etItem[1].map(s => typeof s === 'string' ? s.replace(/{.*?}/g, '') : '').join(' '));
             }
           });
         }
-      });
-      etymology = etyms.length > 0 ? etyms.join(' ') : null;
-      // Headscratcher: look for art field with artid 'heads' or similar
-      let heads = null;
-      secretWordDictEntries.forEach(e => {
-        if (e.art && Array.isArray(e.art)) {
-          e.art.forEach(artItem => {
-            if (artItem.artid && (artItem.artid.toLowerCase().includes('head') || artItem.artid.toLowerCase().includes('scratcher'))) {
-              heads = artItem.caption || artItem.text || null;
-            }
+        // rootpara
+        if (e.rootpara && Array.isArray(e.rootpara)) {
+          e.rootpara.forEach(rp => {
+            if (typeof rp === 'string') etymologyEntries.push(rp.replace(/{.*?}/g, ''));
+            else if (Array.isArray(rp)) etymologyEntries.push(rp.map(s => typeof s === 'string' ? s.replace(/{.*?}/g, '') : '').join(' '));
           });
         }
       });
-      headscratcher = heads;
     }
-    window.showEndgameModal({
-      word: secretWord.word,
-      win,
-      etymology,
-      headscratcher,
-      onPlayAgain: startGame
+    // etymology = etyms.length > 0 ? etyms.join(' ') : null;
+
+    // Headscratcher: look for 'hs' or art with artid containing 'head' or 'scratcher'
+    let heads = null;
+    secretWordDictEntries.forEach(e => {
+      // hs
+      if (e.hs && typeof e.hs === 'string') {
+        heads = e.hs.replace(/{.*?}/g, '');
+      }
+      // art
+      if (e.art && Array.isArray(e.art)) {
+        e.art.forEach(artItem => {
+          if (artItem.artid && (artItem.artid.toLowerCase().includes('head') || artItem.artid.toLowerCase().includes('scratcher'))) {
+            heads = artItem.caption || artItem.text || null;
+          }
+        });
+      }
     });
-    return;
-  }
-  let html = `<span>${msg}</span>`;
-  if (showPlayAgain) {
-    html += ` <button id="play-again-btn" class="replay-button" title="Play Again"><img src="../assets/refresh-button.png" alt="Play Again"></button>`;
-  }
-  // Do not show hint button on win/loss
-  renderBottomBar(html, !showPlayAgain);
-  if (showPlayAgain) {
-    document.getElementById('play-again-btn').addEventListener('click', startGame);
-    // Do NOT set a timeout here, so the message persists
-  } else {
-    setTimeout(() => renderBottomBar('', true), 1500);
-  }
+    headscratcher = heads;
+  
+  window.showEndgameModal({
+    word: secretWord.word,
+    win,
+    etymologyEntries,
+    headscratcher,
+    onPlayAgain: startGame
+  });
+  return;
+}
+
+let html = `<span>${msg}</span>`;
+if (showPlayAgain) {
+  html += ` <button id="play-again-btn" class="replay-button" title="Play Again"><img src="../assets/refresh-button.png" alt="Play Again"></button>`;
+}
+// Do not show hint button on win/loss
+renderBottomBar(html, !showPlayAgain);
+if (showPlayAgain) {
+  document.getElementById('play-again-btn').addEventListener('click', startGame);
+  // Do NOT set a timeout here, so the message persists
+} else {
+  setTimeout(() => renderBottomBar('', true), 1500);
+}
 }
 
 function showHelperMessage(msg) {
@@ -293,35 +349,93 @@ function setupUI() {
   renderBottomBar();
 }
 
-function startGame() {
-  secretWord = pickSecretWord();
-  guesses = [];
-  currentGuess = '';
-  secretWordDictEntries = null;
-  renderBottomBar();
-  setupUI();
-
-  // Fetch definition for the secret word and store the result for hints
-  fetch('https://word-game-backend.netlify.app/.netlify/functions/define?word=' + encodeURIComponent(secretWord.word))
-    .then(res => res.json())
-    .then(data => {
-      // Filter to only entries where meta.id is the word or starts with the word + ' '
-      const word = secretWord.word.toLowerCase();
-      const filtered = data.filter(entry => {
-        if (entry.meta && entry.meta.id) {
-          const idBase = entry.meta.id.split(':')[0].toLowerCase();
-          return idBase === word || idBase.startsWith(word + ' ');
-        }
-        return false;
-      });
-      secretWordDictEntries = filtered;
-      // For testing: log the part-of-speech hint
-      const posHint = window.getPartOfSpeechHint(filtered);
-      if (posHint) {
-        console.log('Hint:', posHint);
-      }
-    })
-    .catch(err => console.error('Error fetching definition:', err));
+function singularize(word) {
+  // Very basic English plural to singular (improve as needed)
+  if (word.endsWith('ies')) return word.slice(0, -3) + 'y';
+  if (word.endsWith('es')) return word.slice(0, -2);
+  if (word.endsWith('s')) return word.slice(0, -1);
+  return word;
 }
 
-document.addEventListener('DOMContentLoaded', startGame);
+function startGame() {
+  function tryPickWordAndFetchDefinition(attempts = 0, triedSingular = false) {
+    if (attempts > 10) {
+      alert('Could not find a word with a definition. Try a different word length.');
+      return;
+    }
+    secretWord = pickSecretWord();
+    guesses = [];
+    currentGuess = '';
+    secretWordDictEntries = null;
+    renderBottomBar();
+    setupUI();
+
+    const wordToQuery = (!triedSingular) ? secretWord.word : singularize(secretWord.word);
+
+    fetch('https://word-game-backend.netlify.app/.netlify/functions/define?word=' + encodeURIComponent(wordToQuery))
+      .then(res => res.json())
+      .then(data => {
+        const word = wordToQuery.toLowerCase();
+        const filtered = data.filter(entry => {
+          if (entry.meta && entry.meta.id) {
+            const idBase = entry.meta.id.split(':')[0].toLowerCase();
+            // Accept if idBase matches either the original word or the singular form
+            return (
+              idBase === secretWord.word.toLowerCase() ||
+              idBase === singularize(secretWord.word.toLowerCase()) ||
+              idBase.startsWith(secretWord.word.toLowerCase() + ' ') ||
+              idBase.startsWith(singularize(secretWord.word.toLowerCase()) + ' ')
+            );
+          }
+          return false;
+        });
+        if (!filtered || filtered.length === 0) {
+          // If not tried singular yet and word is plural, try singular
+          if (!triedSingular && secretWord.word !== singularize(secretWord.word)) {
+            tryPickWordAndFetchDefinition(attempts, true);
+            return;
+          }
+          // No definition found, try a new word
+          tryPickWordAndFetchDefinition(attempts + 1, false);
+          return;
+        }
+        secretWordDictEntries = filtered;
+        console.log('DICT ENTRY:', JSON.stringify(secretWordDictEntries, null, 2));
+
+        // --- LOG ETYMOLOGY AND HEADSCRATCHER IF PRESENT ---
+        let foundEtymology = false, foundHeadscratcher = false;
+        filtered.forEach(e => {
+          if (e.et && Array.isArray(e.et) && e.et.length > 0) {
+            foundEtymology = true;
+            console.log('[ETYMOLOGY]', e.et);
+          }
+          if (e.art && Array.isArray(e.art)) {
+            e.art.forEach(artItem => {
+              if (
+                artItem.artid &&
+                (artItem.artid.toLowerCase().includes('head') || artItem.artid.toLowerCase().includes('scratcher'))
+              ) {
+                foundHeadscratcher = true;
+                console.log('[HEADSCRATCHER]', artItem);
+              }
+            });
+          }
+        });
+        if (!foundEtymology) console.log('No etymology for', secretWord.word);
+        if (!foundHeadscratcher) console.log('No headscratcher for', secretWord.word);
+        // ---------------------------------------------------
+
+        // For testing: log the part-of-speech hint
+        const posHint = window.getPartOfSpeechHint(filtered);
+        if (posHint) {
+          console.log('Word: ', word, '\nHint:', posHint);
+        }
+      })
+      .catch(err => {
+        console.error('Error fetching definition:', err);
+        tryPickWordAndFetchDefinition(attempts + 1, false);
+      });
+  }
+
+  tryPickWordAndFetchDefinition();
+}

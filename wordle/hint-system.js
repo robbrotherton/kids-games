@@ -26,6 +26,33 @@ window.getPartOfSpeechHint = function(dictEntries) {
 };
 
 /**
+ * If the dictionary entry contains a cxs field indicating this word is a past tense/participle/etc,
+ * return a hint like "Past tense of hold".
+ */
+function getFormHint(dictEntries) {
+  for (const entry of dictEntries) {
+    if (entry.cxs && Array.isArray(entry.cxs)) {
+      for (const cxsItem of entry.cxs) {
+        if (
+          cxsItem.cxl &&
+          (cxsItem.cxl.includes("past tense") || cxsItem.cxl.includes("past participle"))
+        ) {
+          // Get the base word from cxtis
+          if (cxsItem.cxtis && Array.isArray(cxsItem.cxtis) && cxsItem.cxtis[0] && cxsItem.cxtis[0].cxt) {
+            return `${cxsItem.cxl.charAt(0).toUpperCase() + cxsItem.cxl.slice(1)} ${cxsItem.cxtis[0].cxt}`;
+          }
+        }
+      }
+    }
+  }
+  return null;
+}
+
+// Export or attach to window if needed
+window.getFormHint = getFormHint;
+
+
+/**
  * Returns an array of hints: part-of-speech, examples, definitions, synonyms
  * @param {Array} dictEntries - Array of dictionary entries from the API
  * @param {string} word - The word to generate hints for
@@ -37,6 +64,13 @@ window.getAllHints = function(dictEntries, word) {
   // Part-of-speech hint
   const posHint = window.getPartOfSpeechHint(dictEntries);
   if (posHint) hints.push(posHint);
+
+  // FORM HINT (e.g., "Past tense of hold")
+  const formHint = window.getFormHint(dictEntries);
+  if (formHint) {
+    hints.push(formHint);
+  }
+
   // Example sentences (with word blanked out)
   const exampleHints = [];
   const wordRegex = new RegExp(word, 'ig');

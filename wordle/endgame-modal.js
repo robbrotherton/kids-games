@@ -1,13 +1,20 @@
 // endgame-modal.js: Modal for win/lose with etymology and headscratcher
 
 window.showEndgameModal = function({
-  word, win, etymology, headscratcher, onPlayAgain
+  word, win, etymologyEntries = [], headscratcher, onPlayAgain
 }) {
   if (document.getElementById('wordle-endgame-modal')) return;
   let idx = 0;
+  // Build sections: each etymology entry is its own page
   const sections = [];
-  if (etymology) sections.push({ label: 'Word History', content: etymology });
-  if (headscratcher) sections.push({ label: 'Headscratcher', content: headscratcher });
+  if (Array.isArray(etymologyEntries) && etymologyEntries.length > 0) {
+    etymologyEntries.forEach(entry => {
+      sections.push({ label: 'Word History', content: entry });
+    });
+  }
+  if (headscratcher) {
+    sections.push({ label: 'Headscratcher', content: headscratcher });
+  }
   const noInfo = sections.length === 0;
   if (noInfo) sections.push({ label: '', content: '' });
 
