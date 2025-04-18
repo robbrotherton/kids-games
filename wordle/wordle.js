@@ -168,6 +168,14 @@ function showMessage(msg, showPlayAgain = false, win = false) {
             else if (Array.isArray(h)) etymologyEntries.push(h.map(s => typeof s === 'string' ? s.replace(/{.*?}/g, '') : '').join(' '));
           });
         }
+        // hs (headscratcher)
+        if (e.hs && typeof e.hs === 'object' && Array.isArray(e.hs.pt)) {
+          e.hs.pt.forEach(ptItem => {
+            if (Array.isArray(ptItem) && typeof ptItem[1] === 'string') {
+              etymologyEntries.push(ptItem[1].replace(/{.*?}/g, ''));
+            }
+          });
+        }
         // et
         if (e.et && Array.isArray(e.et)) {
           e.et.forEach(etItem => {
@@ -179,10 +187,11 @@ function showMessage(msg, showPlayAgain = false, win = false) {
           });
         }
         // rootpara
-        if (e.rootpara && Array.isArray(e.rootpara)) {
-          e.rootpara.forEach(rp => {
-            if (typeof rp === 'string') etymologyEntries.push(rp.replace(/{.*?}/g, ''));
-            else if (Array.isArray(rp)) etymologyEntries.push(rp.map(s => typeof s === 'string' ? s.replace(/{.*?}/g, '') : '').join(' '));
+        if (e.rootpara && typeof e.rootpara === 'object' && Array.isArray(e.rootpara.pt)) {
+          e.rootpara.pt.forEach(ptItem => {
+            if (Array.isArray(ptItem) && typeof ptItem[1] === 'string') {
+              etymologyEntries.push(ptItem[1].replace(/{.*?}/g, ''));
+            }
           });
         }
       });
@@ -340,6 +349,32 @@ function addKeyboardListeners() {
       handleKeyPress(key);
     });
   });
+
+  // Add physical keyboard support
+  window.addEventListener('keydown', physicalKeyboardHandler);
+}
+
+function removeKeyboardListeners() {
+  // Remove the physical keyboard handler to avoid duplicates on new games
+  window.removeEventListener('keydown', physicalKeyboardHandler);
+}
+
+function physicalKeyboardHandler(e) {
+  // Ignore if a modal or input is focused
+  if (
+    document.activeElement &&
+    (document.activeElement.tagName === 'INPUT' ||
+     document.activeElement.tagName === 'TEXTAREA' ||
+     document.activeElement.isContentEditable)
+  ) {
+    return;
+  }
+  let key = e.key;
+  if (key === 'Enter' || key === 'Backspace') {
+    handleKeyPress(key);
+  } else if (/^[a-zA-Z]$/.test(key)) {
+    handleKeyPress(key.toUpperCase());
+  }
 }
 
 function updateKeyboardColors() {
@@ -414,6 +449,7 @@ function startGame() {
     correctLetters = new Set(); // Reset correct letters on new game
     presentLetters = new Set(); // Reset present letters on new game
     renderBottomBar();
+    removeKeyboardListeners(); // Remove previous listeners before adding new ones
     setupUI();
 
     const wordToQuery = (!triedSingular) ? secretWord.word : singularize(secretWord.word);
