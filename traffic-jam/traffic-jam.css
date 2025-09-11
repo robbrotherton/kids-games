@@ -87,7 +87,7 @@ main {
 
 #game-board {
   /* Define the size with CSS custom properties for easy scaling */
-  --board-size: min(300px, 80vw);
+  --board-size: min(600px, 80vw);
   width: var(--board-size);
   height: var(--board-size);
   
@@ -221,9 +221,9 @@ main {
 #exit-indicator {
   width: 0;
   height: 0;
-  border-top: 1.2em solid transparent;
-  border-bottom: 1.2em solid transparent;
-  border-left: 1.5em solid var(--exit-color);
+  border-top: 6vw solid transparent;
+  border-bottom: 6vw solid transparent;
+  border-left: 8vw solid var(--exit-color);
   /* Position precisely at the middle row (row 3 of 6) */
   align-self: center;
   /* Fine-tune vertical positioning */
@@ -233,8 +233,8 @@ main {
   animation: exit-pulse 2s infinite;
   z-index: 0;
   position: absolute;
-  right: -1.6em;
-  top: calc(33% + 0.6em);
+  right: -8vw;
+  top: calc(50% - 12vw);
 }
 
 @keyframes exit-pulse {
@@ -303,7 +303,7 @@ main {
   100% { transform: scale(1); }
 }
 
-/* Responsive design */
+/* Responsive design
 @media (max-width: 600px) {
   #game-board {
     --board-size: min(270px, 85vw);
@@ -322,4 +322,4 @@ main {
   .car {
     font-size: 1rem;
   }
-}
+} */
