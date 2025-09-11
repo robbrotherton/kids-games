@@ -106,20 +106,24 @@ main {
   
   /* Optional: subtle border radius that scales */
   border-radius: calc(var(--board-size) * 0.013);
+  padding: 1em;
 }
 
 .grid-cell {
   background-color: #ecf0f1;
-  border-radius: 2px;
+  border-radius: 3px;
   /* Use box-sizing border-box */
   box-sizing: border-box;
   /* Shrink cells to 95% to let background show through as grid lines */
   width: 95%;
   height: 95%;
+  /* Ensure grid cells are always at the bottom layer */
+  z-index: 1;
+  position: relative;
 }
 
 .car {
-  border-radius: 8px;
+  border-radius: 5px;
   border: 2px solid rgba(0, 0, 0, 0.2);
   cursor: grab;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -133,6 +137,7 @@ main {
   -webkit-user-select: none;
   user-select: none;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  /* Cars appear above grid cells */
   z-index: 10;
   /* Ensure cars fill their grid areas perfectly */
   width: 100%;
@@ -140,6 +145,7 @@ main {
   box-sizing: border-box;
   /* Remove any default margins */
   margin: 0;
+  scale: 85%;
 }
 
 .car:hover {
@@ -203,6 +209,7 @@ main {
   -webkit-user-select: none;
   user-select: none;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  /* Walls appear above grid cells */
   z-index: 10;
   /* Make walls fill their grid areas completely to look solid */
   width: 100%;
@@ -220,10 +227,11 @@ main {
   /* Position precisely at the middle row (row 3 of 6) */
   align-self: center;
   /* Fine-tune vertical positioning */
-  margin-top: 0;
+  margin-top: -2.5em;
   /* Make it more prominent */
   filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
   animation: exit-pulse 2s infinite;
+  z-index: 0;
 }
 
 @keyframes exit-pulse {

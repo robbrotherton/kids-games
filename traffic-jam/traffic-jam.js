@@ -33,11 +33,17 @@ class TrafficJamGame {
 
     createGrid() {
         this.gameBoard.innerHTML = '';
+        // Always create all 36 grid cells
         for (let i = 0; i < this.gridSize * this.gridSize; i++) {
             const cell = document.createElement('div');
             cell.className = 'grid-cell';
+            // Position each grid cell explicitly
+            const row = Math.floor(i / this.gridSize);
+            const col = i % this.gridSize;
+            cell.style.gridArea = `${row + 1} / ${col + 1} / ${row + 2} / ${col + 2}`;
             this.gameBoard.appendChild(cell);
         }
+        console.log(`Created ${this.gridSize * this.gridSize} grid cells`);
     }
 
     setupEventListeners() {
@@ -339,11 +345,13 @@ class TrafficJamGame {
         const existingWalls = this.gameBoard.querySelectorAll('.wall');
         console.log(`Found ${existingCars.length} existing cars and ${existingWalls.length} existing walls to remove`);
         
+        // Only remove cars and walls, leave grid cells intact
         existingCars.forEach(car => car.remove());
         existingWalls.forEach(wall => wall.remove());
         this.cars = [];
         
-        console.log('Board cleared. Remaining elements:', this.gameBoard.children.length);
+        const remainingElements = this.gameBoard.querySelectorAll('.grid-cell');
+        console.log(`Board cleared. Remaining grid cells: ${remainingElements.length}`);
     }
 
     createCars(carData) {
@@ -734,7 +742,7 @@ class TrafficJamGame {
         } else {
             const gameStatus = document.getElementById('game-status');
             if (gameStatus) {
-                gameStatus.textContent = `Keep going! Move count: ${this.moves}`;
+                gameStatus.textContent = ``;
             }
         }
     }
