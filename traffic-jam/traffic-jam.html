@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="traffic-jam.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Varela+Round:wght@400&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <title>Traffic Jam</title>
+</head>
+
+<body>
+  <div id="header">
+    <button id="back-button" type="button" title="Go back" onclick="window.location.href='../index.html'">
+      <img src="../assets/back-arrow.png" alt="Back">
+    </button>
+    <h1 id="game-title">Traffic Jam</h1>
+  </div>
+
+  <main>
+    <div class="game-container">
+      <div id="level-info">
+        <span id="moves-text">Moves: 0</span>
+      </div>
+      
+      <div id="game-board-container">
+        <div id="game-board"></div>
+        <div id="exit-indicator"></div>
+      </div>
+      
+      <div id="game-status"></div>
+    </div>
+  </main>
+
+  <div id="bottom-bar">
+    <button id="reset-button" title="Reset Current Puzzle">
+      <img src="../assets/refresh-button.png" alt="Reset">
+    </button>
+    <button id="next-level" title="New Random Puzzle">🎲</button>
+  </div>
+
+  <script type="module" src="traffic-jam.js"></script>
+</body>
+
+</html>
