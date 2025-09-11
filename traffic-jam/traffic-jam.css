@@ -36,16 +36,31 @@ main {
   justify-content: center;
   align-items: center;
   height: var(--main-height);
-  padding: 20px;
+  padding: 10px;
+  /* Ensure the main area doesn't interfere with game board centering */
+  box-sizing: border-box;
+  /* Remove any potential margin issues */
+  margin: 0;
+  /* Prevent any layout shifts that could affect border rendering */
+  min-height: var(--main-height);
+  overflow: hidden;
 }
 
 .game-container {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 20px;
   max-width: 500px;
   width: 100%;
+  height: 100%;
+  /* Ensure perfect centering within the main area */
+  box-sizing: border-box;
+  /* Prevent any flex compression that might affect borders */
+  flex-shrink: 0;
+  /* Remove any potential margin issues */
+  margin: 0;
 }
 
 #level-info {
@@ -61,25 +76,46 @@ main {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  gap: 15px;
+  /* Center the entire assembly */
+  width: 100%;
+  /* Add some padding to balance the layout */
+  padding: 0 20px;
+  box-sizing: border-box;
 }
 
 #game-board {
+  /* Define the size with CSS custom properties for easy scaling */
+  --board-size: min(300px, 80vw);
+  width: var(--board-size);
+  height: var(--board-size);
+  
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   grid-template-rows: repeat(6, 1fr);
-  gap: 2px;
+  
+  /* No gap - we'll use shrunken cells instead */
+  gap: 0;
+  
   background-color: var(--traffic-grid-color);
-  border: 3px solid var(--traffic-grid-color);
-  border-radius: 8px;
-  width: 300px;
-  height: 300px;
-  position: relative;
+  box-sizing: border-box;
+  
+  /* Center the shrunken cells within their grid areas */
+  place-items: center;
+  
+  /* Optional: subtle border radius that scales */
+  border-radius: calc(var(--board-size) * 0.013);
 }
 
 .grid-cell {
   background-color: #ecf0f1;
   border-radius: 2px;
+  /* Use box-sizing border-box */
+  box-sizing: border-box;
+  /* Shrink cells to 95% to let background show through as grid lines */
+  width: 95%;
+  height: 95%;
 }
 
 .car {
@@ -94,9 +130,16 @@ main {
   font-weight: bold;
   color: white;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  -webkit-user-select: none;
   user-select: none;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   z-index: 10;
+  /* Ensure cars fill their grid areas perfectly */
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  /* Remove any default margins */
+  margin: 0;
 }
 
 .car:hover {
@@ -157,6 +200,7 @@ main {
   font-weight: bold;
   color: white;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  -webkit-user-select: none;
   user-select: none;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   z-index: 10;
@@ -166,11 +210,15 @@ main {
 #exit-indicator {
   width: 0;
   height: 0;
-  border-top: 1em solid transparent;
-  border-bottom: 1em solid transparent;
-  border-left: 1.2em solid var(--exit-color);
-  align-self: flex-start; /* Don't center with the container */
-  margin-top: calc(28% + 1em); /* Position at 3rd row minus half triangle height */
+  border-top: 1.2em solid transparent;
+  border-bottom: 1.2em solid transparent;
+  border-left: 1.5em solid var(--exit-color);
+  /* Position precisely at the middle row (row 3 of 6) */
+  align-self: center;
+  /* Fine-tune vertical positioning */
+  margin-top: 0;
+  /* Make it more prominent */
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
   animation: exit-pulse 2s infinite;
 }
 
@@ -243,28 +291,7 @@ main {
 /* Responsive design */
 @media (max-width: 600px) {
   #game-board {
-    width: 270px;
-    height: 270px;
-  }
-  
-  .car.horizontal {
-    width: calc(90px - 4px);
-    height: calc(45px - 4px);
-  }
-
-  .car.vertical {
-    width: calc(45px - 4px);
-    height: calc(90px - 4px);
-  }
-
-  .car.long-horizontal {
-    width: calc(135px - 4px);
-    height: calc(45px - 4px);
-  }
-
-  .car.long-vertical {
-    width: calc(45px - 4px);
-    height: calc(135px - 4px);
+    --board-size: min(270px, 85vw);
   }
   
   .car {
@@ -274,28 +301,7 @@ main {
 
 @media (max-width: 400px) {
   #game-board {
-    width: 240px;
-    height: 240px;
-  }
-  
-  .car.horizontal {
-    width: calc(80px - 4px);
-    height: calc(40px - 4px);
-  }
-
-  .car.vertical {
-    width: calc(40px - 4px);
-    height: calc(80px - 4px);
-  }
-
-  .car.long-horizontal {
-    width: calc(120px - 4px);
-    height: calc(40px - 4px);
-  }
-
-  .car.long-vertical {
-    width: calc(40px - 4px);
-    height: calc(120px - 4px);
+    --board-size: min(240px, 90vw);
   }
   
   .car {
