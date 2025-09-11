@@ -239,6 +239,18 @@ class TrafficJamGame {
         const carPositions = new Map();
         const wallPositions = [];
         
+        console.log('Parsing board config:', boardConfig);
+        
+        // Display config as a readable grid
+        console.log('Board layout:');
+        for (let row = 0; row < 6; row++) {
+            const start = row * 6;
+            const end = start + 6;
+            const rowChars = boardConfig.slice(start, end).split('').join(' ');
+            const positions = `(positions ${start}-${end-1})`;
+            console.log(`Row ${row}: ${rowChars}   ${positions}`);
+        }
+        
         // Find all positions for each car letter and walls
         for (let i = 0; i < boardConfig.length; i++) {
             const char = boardConfig[i];
@@ -247,6 +259,7 @@ class TrafficJamGame {
             
             if (char === 'x') {
                 // Handle walls
+                console.log(`Found wall at position ${i} (row ${row}, col ${col})`);
                 wallPositions.push({ row, col });
             } else if (char !== 'o') {
                 // Handle cars (not empty spaces)
@@ -257,9 +270,12 @@ class TrafficJamGame {
             }
         }
         
+        console.log('Car positions map:', carPositions);
+        console.log('Wall positions:', wallPositions);
+        
         // Create wall objects
         wallPositions.forEach((pos, index) => {
-            cars.push({
+            const wallObj = {
                 id: `wall-${index}`,
                 color: 'grey',
                 orientation: 'horizontal',
@@ -269,7 +285,9 @@ class TrafficJamGame {
                     col: pos.col
                 },
                 isWall: true
-            });
+            };
+            console.log(`Creating wall object:`, wallObj);
+            cars.push(wallObj);
         });
         
         // Create car objects
@@ -316,12 +334,20 @@ class TrafficJamGame {
     }
 
     clearBoard() {
+        console.log('Clearing board...');
         const existingCars = this.gameBoard.querySelectorAll('.car');
+        const existingWalls = this.gameBoard.querySelectorAll('.wall');
+        console.log(`Found ${existingCars.length} existing cars and ${existingWalls.length} existing walls to remove`);
+        
         existingCars.forEach(car => car.remove());
+        existingWalls.forEach(wall => wall.remove());
         this.cars = [];
+        
+        console.log('Board cleared. Remaining elements:', this.gameBoard.children.length);
     }
 
     createCars(carData) {
+        console.log(`Creating ${carData.length} cars/walls:`, carData);
         carData.forEach(carInfo => {
             const car = this.createCar(carInfo);
             this.cars.push({
@@ -335,9 +361,19 @@ class TrafficJamGame {
             this.gameBoard.appendChild(car);
             this.positionCar(car, carInfo.position);
         });
+        console.log(`Total elements in game board after creation: ${this.gameBoard.children.length}`);
+        console.log(`Cars array length: ${this.cars.length}`);
+        
+        // Debug: Check what elements are actually in the DOM
+        const allElements = Array.from(this.gameBoard.children);
+        console.log('All elements in DOM:');
+        allElements.forEach((element, index) => {
+            console.log(`  ${index}: class="${element.className}", data-car-id="${element.dataset.carId}", gridArea="${element.style.gridArea}"`);
+        });
     }
 
     createCar(carInfo) {
+        console.log(`Creating car/wall element:`, carInfo);
         const car = document.createElement('div');
         if (carInfo.isWall) {
             car.className = `wall ${carInfo.color}`;
@@ -345,6 +381,12 @@ class TrafficJamGame {
             car.className = `car ${carInfo.color} ${carInfo.orientation}`;
         }
         car.dataset.carId = carInfo.id;
+        
+        console.log(`Created element with className: ${car.className}, data-car-id: ${car.dataset.carId}`);
+        
+        // Clear any previous animation styles (in case of level reload after win)
+        car.style.transition = '';
+        car.style.transform = '';
         
         // Clear any previous animation styles (in case of level reload after win)
         car.style.transition = '';
@@ -376,7 +418,12 @@ class TrafficJamGame {
         const startCol = position.col + 1;
         
         let endRow, endCol;
-        if (carData.orientation === 'horizontal') {
+        
+        if (carData.isWall) {
+            // Walls always occupy exactly one cell
+            endRow = startRow + 1;
+            endCol = startCol + 1;
+        } else if (carData.orientation === 'horizontal') {
             endRow = startRow + 1;
             endCol = startCol + carData.size;
         } else {
@@ -385,6 +432,7 @@ class TrafficJamGame {
         }
         
         // Set the grid area to span the correct cells
+        console.log(`Setting grid area for ${carData.isWall ? 'wall' : 'car'} ${carData.id}: ${startRow} / ${startCol} / ${endRow} / ${endCol}`);
         carElement.style.gridArea = `${startRow} / ${startCol} / ${endRow} / ${endCol}`;
         
         // Remove any absolute positioning styles
