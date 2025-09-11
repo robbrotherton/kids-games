@@ -718,7 +718,11 @@ class TrafficJamGame {
     }
 
     celebrateWin() {
-        document.getElementById('game-status').textContent = '🎉 Level Complete! 🎉';
+        // Check if the level was completed in minimum moves
+        const isOptimalSolution = this.currentPuzzle && this.moves === this.currentPuzzle.minMoves;
+        const winMessage = isOptimalSolution ? '🎯 Nailed it! 🎯' : '🎉 Level Complete! 🎉';
+        
+        document.getElementById('game-status').textContent = winMessage;
         
         // Confetti animation
         if (typeof confetti !== 'undefined') {
