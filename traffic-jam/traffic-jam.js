@@ -706,7 +706,7 @@ class TrafficJamGame {
         redCarElement.style.transition = 'transform 1s ease-in-out';
         
         // Animate the car sliding off to the right
-        redCarElement.style.transform = 'translateX(200px)';
+        redCarElement.style.transform = 'translateX(400px)';
         
         // Trigger celebration after animation starts
         setTimeout(() => {

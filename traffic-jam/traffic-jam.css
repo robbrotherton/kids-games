@@ -230,7 +230,7 @@ main {
   /* Make it more prominent */
   filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
   animation: exit-pulse 2s infinite;
-  z-index: 0;
+  z-index: -5;
   position: absolute;
   right: -8vw;
   top: calc(50% - 12vw);
