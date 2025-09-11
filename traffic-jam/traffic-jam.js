@@ -497,7 +497,7 @@ class TrafficJamGame {
         newX -= rect.left;
         newY -= rect.top;
         
-        let newPosition;
+        let desiredPosition;
         
         // Constrain movement based on car orientation and snap to grid
         if (carData.orientation === 'horizontal') {
@@ -508,20 +508,72 @@ class TrafficJamGame {
             let maxCol = this.gridSize - carData.size;
             
             const snappedCol = Math.max(0, Math.min(maxCol, gridCol));
-            newPosition = { row: carData.position.row, col: snappedCol };
+            desiredPosition = { row: carData.position.row, col: snappedCol };
         } else {
             // Only allow vertical movement
             const gridRow = Math.round(newY / (actualCellSize + gap));
             const snappedRow = Math.max(0, Math.min(this.gridSize - carData.size, gridRow));
-            newPosition = { row: snappedRow, col: carData.position.col };
+            desiredPosition = { row: snappedRow, col: carData.position.col };
         }
         
-        // Check if the snapped position is valid (no collisions) and different from current
-        if (this.isValidMove(carData, newPosition) && 
-            (newPosition.row !== carData.position.row || newPosition.col !== carData.position.col)) {
+        // Find the furthest valid position the car can slide to without jumping over obstacles
+        const reachablePosition = this.getFurthestReachablePosition(carData, desiredPosition);
+        
+        // Only update position if it's different from current and reachable
+        if ((reachablePosition.row !== carData.position.row || reachablePosition.col !== carData.position.col)) {
             // Update the visual position immediately during drag
-            this.updateCarGridPosition(this.dragCar, newPosition, carData);
+            this.updateCarGridPosition(this.dragCar, reachablePosition, carData);
         }
+    }
+
+    getFurthestReachablePosition(carData, desiredPosition) {
+        const currentPos = carData.position;
+        
+        // If desired position is the same as current, return current
+        if (currentPos.row === desiredPosition.row && currentPos.col === desiredPosition.col) {
+            return currentPos;
+        }
+        
+        // Determine direction of movement
+        let direction;
+        if (carData.orientation === 'horizontal') {
+            direction = desiredPosition.col > currentPos.col ? 1 : -1; // 1 = right, -1 = left
+        } else {
+            direction = desiredPosition.row > currentPos.row ? 1 : -1; // 1 = down, -1 = up
+        }
+        
+        // Start from current position and move step by step until we hit an obstacle
+        let testPosition = { ...currentPos };
+        let lastValidPosition = { ...currentPos };
+        
+        while (true) {
+            // Calculate next position
+            if (carData.orientation === 'horizontal') {
+                testPosition.col += direction;
+                // Stop if we've reached the desired position or gone beyond bounds
+                if ((direction > 0 && testPosition.col > desiredPosition.col) ||
+                    (direction < 0 && testPosition.col < desiredPosition.col)) {
+                    break;
+                }
+            } else {
+                testPosition.row += direction;
+                // Stop if we've reached the desired position or gone beyond bounds
+                if ((direction > 0 && testPosition.row > desiredPosition.row) ||
+                    (direction < 0 && testPosition.row < desiredPosition.row)) {
+                    break;
+                }
+            }
+            
+            // Check if this position is valid
+            if (this.isValidMove(carData, testPosition)) {
+                lastValidPosition = { ...testPosition };
+            } else {
+                // Hit an obstacle, stop here
+                break;
+            }
+        }
+        
+        return lastValidPosition;
     }
 
     handleEnd(e) {
