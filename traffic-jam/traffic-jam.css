@@ -139,13 +139,12 @@ main {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   /* Cars appear above grid cells */
   z-index: 10;
-  /* Ensure cars fill their grid areas perfectly */
-  width: 100%;
-  height: 100%;
+  /* Reduce size by same amount of pixels on all sides */
+  width: calc(100% - 12px);
+  height: calc(100% - 12px);
   box-sizing: border-box;
-  /* Remove any default margins */
-  margin: 0;
-  scale: 90%;
+  /* Center the smaller cars in their grid cells */
+  margin: 4px;
 }
 
 .car:hover {
