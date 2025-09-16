@@ -218,28 +218,22 @@ main {
 
 /* Exit indicator - CSS triangle positioned at 3rd row */
 #exit-indicator {
-  width: 0;
-  height: 0;
-  border-top: 6vw solid transparent;
-  border-bottom: 6vw solid transparent;
-  border-left: 8vw solid var(--exit-color);
-  /* Position precisely at the middle row (row 3 of 6) */
-  align-self: center;
-  /* Fine-tune vertical positioning */
-  /* margin-top: -8.6%; */
-  /* Make it more prominent */
-  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
-  animation: exit-pulse 2s infinite;
-  z-index: -5;
+  width: 5%; /* Or any percentage width */
+  height: 10%; /* Or a specific height if needed */
+  padding-bottom: 5%; /* Creates a 2:1 aspect ratio based on width */
+  background: var(--exit-color); /* Or any desired color */
+  clip-path: polygon(0% 0%, 0% 100%, 100% 50%);
   position: absolute;
-  right: -8vw;
-  top: calc(50% - 12vw);
+  top: 37.5%;
+  right: -6%;
+  z-index: -1;
+  animation: exit-pulse 2s infinite;
 }
 
 @keyframes exit-pulse {
-  0% { opacity: 0.6; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.1); }
-  100% { opacity: 0.6; transform: scale(1); }
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
 }
 
 #game-status {
