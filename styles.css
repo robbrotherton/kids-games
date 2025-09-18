@@ -29,6 +29,11 @@ body {
   overflow: hidden;
 }
 
+.game-card {
+  text-align: center;
+  font-size: 2em;
+}
+
 #header {
   display: flex;
   justify-content: space-between;
@@ -119,6 +124,12 @@ body {
   font-family: "Roboto Mono", monospace;
   font-optical-sizing: auto;
   font-weight: 600;
+  font-style: normal;
+}
+
+.tilt-neon-regular {
+  font-family: "Tilt Neon", sans-serif;
+  font-weight: 400;
   font-style: normal;
 }
 
