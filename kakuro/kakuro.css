@@ -52,17 +52,19 @@ main {
   padding: 10px;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-width: min(700px, 95vw);
+  width: 100%;
 }
 
 .kakuro-cell {
-  width: 40px;
-  height: 40px;
+  aspect-ratio: 1;
+  min-width: 0;
   border: 2px solid var(--kakuro-cell-border);
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 500;
-  font-size: 16px;
+  font-size: 3em;
   transition: all 0.2s ease;
 }
 
@@ -114,6 +116,7 @@ main {
   position: relative;
   background-color: var(--kakuro-clue-bg);
   color: var(--kakuro-clue-color);
+   font-size: 2em;
 }
 
 .clue-cell .diagonal {
@@ -129,7 +132,7 @@ main {
   position: absolute;
   top: 3px;
   right: 5px;
-  font-size: 11px;
+ 
   font-weight: 700;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
   z-index: 10;
@@ -139,7 +142,6 @@ main {
   position: absolute;
   bottom: 3px;
   left: 5px;
-  font-size: 11px;
   font-weight: 700;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
   z-index: 10;
@@ -280,38 +282,6 @@ select {
   75% { transform: translateX(5px); }
 }
 
-/* Responsive design */
-@media (max-width: 480px) {
-  .kakuro-cell {
-    width: 35px;
-    height: 35px;
-    font-size: 14px;
-  }
-  
-  .clue-cell .down-clue,
-  .clue-cell .right-clue {
-    font-size: 9px;
-  }
-  
-  .difficulty-button {
-    padding: 6px 12px;
-    font-size: 14px;
-  }
-}
-
-@media (min-width: 768px) {
-  .kakuro-cell {
-    width: 50px;
-    height: 50px;
-    font-size: 18px;
-  }
-  
-  .clue-cell .down-clue,
-  .clue-cell .right-clue {
-    font-size: 12px;
-  }
-}
-
 /* Digit palette (mobile input) */
 .digit-palette {
   display: grid;
@@ -322,17 +292,19 @@ select {
   border-top: 1px solid var(--kakuro-cell-border);
   box-shadow: 0 -4px 12px rgba(0,0,0,0.06);
   margin-top: auto;
+  max-width: min(700px, 95vw);
+  width: 100%;
 }
 
 .digit-tile {
-  height: 44px;
+  height: clamp(40px, 8vw, 50px);
   border-radius: 8px;
   border: 2px solid var(--kakuro-cell-border);
   background: var(--kakuro-cell-bg);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: clamp(16px, 3.5vw, 20px);
   font-weight: 700;
   cursor: grab;
   user-select: none;
@@ -360,14 +332,15 @@ select {
   position: fixed;
   pointer-events: none;
   z-index: 2000;
-  width: 44px;
-  height: 44px;
+  width: clamp(40px, 8vw, 50px);
+  height: clamp(40px, 8vw, 50px);
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 8px;
   background: rgba(0,123,255,0.95);
   color: white;
+  font-size: clamp(16px, 3.5vw, 20px);
   font-weight: 700;
   box-shadow: 0 8px 20px rgba(0,0,0,0.2);
   touch-action: none;
