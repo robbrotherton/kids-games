@@ -1,0 +1,375 @@
+:root {
+  --kakuro-bg-color: #f8f9fa;
+  --kakuro-fg-color: #212529;
+  --kakuro-accent-color: #007bff;
+  --kakuro-grid-color: #333;
+  --kakuro-clue-bg: #343a40;
+  --kakuro-clue-color: #fff;
+  --kakuro-cell-bg: #fff;
+  --kakuro-cell-border: #dee2e6;
+  --kakuro-highlight: #fff3cd;
+  --kakuro-error: #f8d7da;
+  --kakuro-correct: #d4edda;
+  --kakuro-font: "Roboto Mono", monospace;
+}
+
+body {
+  background-color: var(--kakuro-bg-color);
+  color: var(--kakuro-fg-color);
+  font-family: var(--kakuro-font);
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: var(--main-height);
+  padding: 10px;
+}
+
+.game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+#game {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  flex: 1;
+  overflow: auto;
+}
+
+.kakuro-grid {
+  display: grid;
+  gap: 2px;
+  background-color: var(--kakuro-grid-color);
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.kakuro-cell {
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--kakuro-cell-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.kakuro-cell.black {
+  background-color: var(--kakuro-clue-bg);
+  color: var(--kakuro-clue-color);
+}
+
+.kakuro-cell.white {
+  background-color: var(--kakuro-cell-bg);
+  cursor: pointer;
+  user-select: none;
+  touch-action: none;
+}
+
+.kakuro-cell.white:hover {
+  background-color: var(--kakuro-highlight);
+}
+
+.kakuro-cell.white.selected {
+  background-color: var(--kakuro-accent-color);
+  color: white;
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+}
+
+.kakuro-cell.white.error {
+  background-color: var(--kakuro-error);
+  animation: shake 0.3s ease-in-out;
+}
+
+.kakuro-cell.white.correct {
+  background-color: var(--kakuro-correct);
+}
+
+.kakuro-cell input {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  outline: none;
+}
+
+.clue-cell {
+  position: relative;
+  background-color: var(--kakuro-clue-bg);
+  color: var(--kakuro-clue-color);
+}
+
+.clue-cell .diagonal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom right, transparent 48%, rgba(255, 255, 255, 0.3) 48%, rgba(255, 255, 255, 0.3) 52%, transparent 52%);
+}
+
+.clue-cell .down-clue {
+  position: absolute;
+  top: 3px;
+  right: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+
+.clue-cell .right-clue {
+  position: absolute;
+  bottom: 3px;
+  left: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+
+#game-status {
+  margin-top: 15px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 500;
+  min-height: 25px;
+}
+
+#bottom-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--kakuro-bg-color);
+  padding: 0 20px;
+  border-top: 1px solid var(--kakuro-cell-border);
+}
+
+.difficulty-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.difficulty-buttons.hidden {
+  display: none;
+}
+
+.difficulty-button {
+  padding: 8px 16px;
+  border: 2px solid var(--kakuro-accent-color);
+  background-color: transparent;
+  color: var(--kakuro-accent-color);
+  border-radius: 20px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.difficulty-button:hover {
+  background-color: var(--kakuro-accent-color);
+  color: white;
+}
+
+.difficulty-button.active {
+  background-color: var(--kakuro-accent-color);
+  color: white;
+}
+
+#try-again-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+#try-again-button:hover {
+  background-color: rgba(0, 123, 255, 0.1);
+}
+
+#try-again-button img {
+  width: 24px;
+  height: 24px;
+}
+
+/* Modal styles */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: var(--kakuro-cell-bg);
+  margin: 15% auto;
+  padding: 20px;
+  border-radius: 8px;
+  width: 300px;
+  max-width: 90%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.close:hover {
+  color: var(--kakuro-fg-color);
+}
+
+.setting-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 15px 0;
+}
+
+.setting-group label {
+  font-weight: 500;
+}
+
+input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+select {
+  padding: 5px 10px;
+  border: 1px solid var(--kakuro-cell-border);
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 14px;
+  background-color: var(--kakuro-cell-bg);
+  color: var(--kakuro-fg-color);
+  cursor: pointer;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .kakuro-cell {
+    width: 35px;
+    height: 35px;
+    font-size: 14px;
+  }
+  
+  .clue-cell .down-clue,
+  .clue-cell .right-clue {
+    font-size: 9px;
+  }
+  
+  .difficulty-button {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 768px) {
+  .kakuro-cell {
+    width: 50px;
+    height: 50px;
+    font-size: 18px;
+  }
+  
+  .clue-cell .down-clue,
+  .clue-cell .right-clue {
+    font-size: 12px;
+  }
+}
+
+/* Digit palette (mobile input) */
+.digit-palette {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.97);
+  border-top: 1px solid var(--kakuro-cell-border);
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.06);
+  margin-top: auto;
+}
+
+.digit-tile {
+  height: 44px;
+  border-radius: 8px;
+  border: 2px solid var(--kakuro-cell-border);
+  background: var(--kakuro-cell-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+.digit-tile:active {
+  cursor: grabbing;
+  transform: scale(0.98);
+}
+
+.digit-tile.clear {
+  background: #ffc9c9;
+  color: #800;
+}
+
+/* Visual drop target feedback */
+.kakuro-cell.drop-target {
+  outline: 3px dashed rgba(0,123,255,0.6);
+  outline-offset: -6px;
+}
+
+/* When dragging a placed tile */
+.dragging-clone {
+  position: fixed;
+  pointer-events: none;
+  z-index: 2000;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(0,123,255,0.95);
+  color: white;
+  font-weight: 700;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  touch-action: none;
+  user-select: none;
+}

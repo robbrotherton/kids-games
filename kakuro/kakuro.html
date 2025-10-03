@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="kakuro.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <title>Kakuro</title>
+
+</head>
+
+<body>
+  <div id="header">
+    <button id="back-button" type="button" title="Go back" onclick="window.location.href='../index.html'"><img
+      src="../assets/back-arrow.png" alt="Back"></button>
+    <h1 id="game-title">Kakuro</h1>
+    <button id="settings-button" type="button" title="Settings"><img src="../assets/settings-gear.png" alt="Settings"></button>
+  </div>
+
+  <main>
+    <div class="game-container">
+        <div id="game"></div>
+        <div id="game-status"></div>
+        
+        <!-- Number palette for mobile / touch input -->
+        <div id="digit-palette" class="digit-palette" aria-label="Number palette">
+          <!-- Row 1: 1-5 -->
+          <button class="digit-tile" data-value="1">1</button>
+          <button class="digit-tile" data-value="2">2</button>
+          <button class="digit-tile" data-value="3">3</button>
+          <button class="digit-tile" data-value="4">4</button>
+          <button class="digit-tile" data-value="5">5</button>
+          <!-- Row 2: 6-9 + Clear -->
+          <button class="digit-tile" data-value="6">6</button>
+          <button class="digit-tile" data-value="7">7</button>
+          <button class="digit-tile" data-value="8">8</button>
+          <button class="digit-tile" data-value="9">9</button>
+          <button class="digit-tile clear" data-value="">Clear</button>
+        </div>
+    </div>
+  </main>
+
+  <div id="bottom-bar">
+    <div class="difficulty-buttons">
+        <button class="difficulty-button active" data-difficulty="easy" title="Easy puzzles">Easy</button>
+        <button class="difficulty-button" data-difficulty="medium" title="Medium puzzles">Medium</button>
+        <button class="difficulty-button" data-difficulty="hard" title="Hard puzzles">Hard</button>
+    </div>
+    <button id="try-again-button" title="New puzzle"><img src="../assets/refresh-button.png" alt="refresh"></button>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Settings</h2>
+      <div class="setting-group">
+        <label for="grid-size">Grid size:</label>
+        <select id="grid-size">
+          <option value="2x2">2x2 (Beginner)</option>
+          <option value="3x3">3x3 (Easy)</option>
+          <option value="regular">Regular (Advanced)</option>
+        </select>
+      </div>
+      <div class="setting-group">
+        <label for="show-hints">Show hints:</label>
+        <input type="checkbox" id="show-hints" checked>
+      </div>
+      <div class="setting-group">
+        <label for="highlight-errors">Highlight errors:</label>
+        <input type="checkbox" id="highlight-errors" checked>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="kakuro.js"></script>
+</body>
+
+</html>
